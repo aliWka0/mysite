@@ -3,16 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIGNAL OPERATOR // CITY_OS_V9_CHAOS</title>
+    <title>SIGNAL OPERATOR // CITY_OS_V1</title>
     <style>
         :root {
             --primary: #00ff41;
             --secondary: #008F11;
             --alert: #ff003c;
-            --warning: #ffaa00;
-            --drone: #ff00ff;
             --bg: #050505;
-            --glass: rgba(0, 10, 0, 0.92);
+            --glass: rgba(0, 20, 0, 0.85);
             --font-stack: 'Courier New', Courier, monospace;
         }
 
@@ -46,173 +44,162 @@
             display: grid;
             grid-template-columns: 320px 1fr 320px;
             grid-template-rows: auto 1fr auto;
-            padding: 15px;
+            padding: 20px;
             box-sizing: border-box;
         }
 
         .panel {
             background: var(--glass);
             border: 1px solid var(--secondary);
-            padding: 15px;
+            padding: 20px;
             pointer-events: auto;
             backdrop-filter: blur(4px);
-            box-shadow: 0 0 15px rgba(0, 255, 65, 0.05);
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.1);
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            border-radius: 2px;
+            gap: 15px;
         }
 
-        h3 {
-            margin: 0 0 5px 0;
+        h1, h2, h3 {
+            margin: 0 0 10px 0;
             text-transform: uppercase;
             letter-spacing: 2px;
-            font-size: 13px;
+            font-size: 14px;
             border-bottom: 1px solid var(--secondary);
-            padding-bottom: 5px;
+            padding-bottom: 8px;
             color: #fff;
             text-shadow: 0 0 5px var(--primary);
         }
 
         /* CONTROLS */
-        .control-group { margin-bottom: 4px; }
+        .control-group {
+            margin-bottom: 5px;
+        }
+
         .control-group label {
             display: flex;
             justify-content: space-between;
-            font-size: 11px;
-            margin-bottom: 2px;
+            font-size: 12px;
+            margin-bottom: 8px;
             font-weight: bold;
-            color: #aaa;
         }
-        
+
         input[type="range"] {
             -webkit-appearance: none;
             width: 100%;
             background: transparent;
-            margin: 4px 0;
         }
+
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            height: 10px; width: 10px;
+            height: 14px;
+            width: 14px;
             background: var(--primary);
-            margin-top: -4px;
+            margin-top: -5px;
             cursor: pointer;
             border: 1px solid #fff;
-            box-shadow: 0 0 8px var(--primary);
+            box-shadow: 0 0 5px var(--primary);
         }
+
         input[type="range"]::-webkit-slider-runnable-track {
-            width: 100%; height: 2px;
+            width: 100%;
+            height: 4px;
             cursor: pointer;
-            background: #333;
+            background: var(--secondary);
         }
 
         /* METRICS */
         .metric {
-            display: flex; justify-content: space-between;
-            font-size: 11px; margin-bottom: 2px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            margin-bottom: 5px;
         }
+
         .bar-container {
-            width: 100%; height: 4px;
-            background: #111; margin-bottom: 8px;
+            width: 100%;
+            height: 8px;
+            background: #111;
+            margin-bottom: 15px;
             border: 1px solid #333;
-            position: relative;
         }
+
         .bar-fill {
-            height: 100%; background: var(--primary);
+            height: 100%;
+            background: var(--primary);
             width: 50%;
-            transition: width 0.1s linear, background-color 0.2s;
+            transition: width 0.2s, background-color 0.2s;
             box-shadow: 0 0 5px var(--primary);
         }
 
-        /* ZONES */
-        .zone-indicator {
-            font-size: 10px; padding: 5px;
-            border: 1px solid #222; margin-top: 3px;
-            color: #666;
-            display: flex; justify-content: space-between; align-items: center;
-            background: rgba(0,0,0,0.5);
-            transition: all 0.2s;
-        }
-        .zone-active { color: #fff; background: rgba(255, 255, 255, 0.05); border-color: #555; }
-        .zone-resonance {
-            color: #00ff41; background: rgba(0, 255, 65, 0.1);
-            border-color: var(--primary);
-            box-shadow: inset 0 0 8px var(--primary);
-        }
-        .zone-overheat {
-            border-color: var(--alert); background: rgba(255, 0, 60, 0.2);
-            animation: pulse-red 0.5s infinite;
-        }
-        .heat-bar { width: 50px; height: 3px; background: #222; margin-left: 8px; }
-        .heat-fill { height: 100%; background: var(--alert); width: 0%; }
-
-        /* LOG */
-        #log-panel {
-            grid-column: 2; grid-row: 3;
-            margin: 0 20px 30px 20px;
-            height: 120px;
-            background: rgba(0,0,0,0.8);
-            border: 1px solid #333;
-            padding: 10px;
-            font-size: 11px;
-            overflow-y: hidden;
-            display: flex;
-            flex-direction: column-reverse;
-            pointer-events: none;
-            mask-image: linear-gradient(to top, black 80%, transparent 100%);
-        }
-        .log-entry { margin-top: 2px; opacity: 0.8; }
-        .log-warn { color: var(--warning); }
-        .log-crit { color: var(--alert); font-weight: bold; }
-        .log-success { color: var(--primary); }
-
-        /* HEADER */
-        #status-display {
-            grid-column: 2; display: flex; flex-direction: column; align-items: center;
-            margin-top: 10px; pointer-events: none;
-        }
-        #status-display h1 {
-            margin: 0; font-size: 20px; letter-spacing: 6px;
-            text-align: center; color: #fff; text-shadow: 0 0 10px var(--primary);
-            background: rgba(0,0,0,0.5); padding: 5px 20px; border-bottom: 1px solid var(--primary);
-        }
-        #system-state {
-            font-size: 14px; padding: 2px 10px;
-            background: rgba(0,0,0,0.8); border: 1px solid currentColor;
-            letter-spacing: 2px; margin-top: 5px;
-        }
-
-        /* BUTTONS */
-        .btn {
-            background: transparent; border: 1px solid var(--primary);
-            color: var(--primary); padding: 6px; cursor: pointer;
-            font-family: var(--font-stack); text-transform: uppercase;
-            font-size: 10px; transition: all 0.2s; margin-top: 4px; width: 100%;
-        }
-        .btn:hover { background: var(--primary); color: #000; }
-        .btn-active { background: var(--primary); color: #000; box-shadow: 0 0 8px var(--primary); }
-        .btn-alert { border-color: var(--alert); color: var(--alert); }
-        .btn-alert:hover { background: var(--alert); color: #fff; }
-
-        @keyframes pulse-red {
-            0% { box-shadow: inset 0 0 0 0 rgba(255,0,60,0.4); }
-            50% { box-shadow: inset 0 0 15px 0 rgba(255,0,60,0.2); }
-            100% { box-shadow: inset 0 0 0 0 rgba(255,0,60,0); }
-        }
-
-        /* EFFECTS */
+        /* SCANLINES */
         .scanlines {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
-            background-size: 100% 4px; pointer-events: none; z-index: 90; opacity: 0.4;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(
+                to bottom,
+                rgba(255,255,255,0),
+                rgba(255,255,255,0) 50%,
+                rgba(0,0,0,0.2) 50%,
+                rgba(0,0,0,0.2)
+            );
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 100;
+            opacity: 0.2;
         }
-        .vignette {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle, transparent 60%, rgba(0,0,0,0.9) 100%);
-            pointer-events: none; z-index: 89;
+
+        /* STATUS */
+        #status-display {
+            grid-column: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        #status-display h1 {
+            border: none;
+            font-size: 28px;
+            letter-spacing: 5px;
+            margin-bottom: 5px;
+        }
+
+        #system-state {
+            font-size: 18px;
+            padding: 5px 15px;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid currentColor;
+        }
+
+        .blinking {
+            animation: blink 0.5s infinite;
+        }
+
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        /* INSTRUCTIONS */
+        #instructions {
+            grid-column: 2;
+            align-self: end;
+            margin-bottom: 30px;
+            font-size: 11px;
+            opacity: 0.8;
+            text-align: center;
+            background: rgba(0,0,0,0.8);
+            padding: 10px;
+            border: 1px solid #333;
+            color: #aaa;
         }
     </style>
-    <!-- Import Map -->
+    <!-- Import Map for Three.js -->
     <script type="importmap">
         {
             "imports": {
@@ -223,27 +210,27 @@
     </script>
 </head>
 <body>
+
     <div class="scanlines"></div>
-    <div class="vignette"></div>
 
     <div id="ui-layer">
-        <!-- LEFT: CONTROLS -->
+        <!-- LEFT PANEL: CONTROLS -->
         <div class="panel" style="grid-column: 1; grid-row: 2; align-self: center;">
-            <h3>SIGNAL MODULATOR</h3>
+            <h3>Signal Modulator</h3>
             
             <div class="control-group">
                 <label>FREQUENCY (Hz) <span id="val-freq">1.0</span></label>
-                <input type="range" id="inp-freq" min="0.5" max="9.5" step="0.1" value="1.0">
+                <input type="range" id="inp-freq" min="0.1" max="8.0" step="0.1" value="1.0">
             </div>
 
             <div class="control-group">
-                <label>AMPLITUDE (Pwr) <span id="val-amp">0.3</span></label>
-                <input type="range" id="inp-amp" min="0.0" max="2.0" step="0.05" value="0.3">
+                <label>AMPLITUDE (Power) <span id="val-amp">0.5</span></label>
+                <input type="range" id="inp-amp" min="0.0" max="1.5" step="0.05" value="0.3">
             </div>
 
             <div class="control-group">
-                <label>ENTROPY (Noise) <span id="val-noise">0.1</span></label>
-                <input type="range" id="inp-noise" min="0.0" max="1.0" step="0.01" value="0.1">
+                <label>NOISE (Entropy) <span id="val-noise">0.2</span></label>
+                <input type="range" id="inp-noise" min="0.0" max="1.0" step="0.01" value="0.2">
             </div>
 
             <div class="control-group">
@@ -251,35 +238,22 @@
                 <input type="range" id="inp-vec" min="0" max="360" step="1" value="0">
             </div>
 
-            <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid #333;">
-                <label style="color:#888; font-size:10px;">EXTERNAL INPUT</label>
-                <button id="btn-audio" class="btn">ENABLE AUDIO ENGINE</button>
-                <button id="btn-mic" class="btn btn-alert">LINK MICROPHONE</button>
-            </div>
-            
-            <div style="font-size: 9px; color: #555; margin-top: 8px; line-height: 1.4;">
-                [INFO]<br>
-                > MATCH FREQ TO ZONE TARGET<br>
-                > HIGH AMP = PHYSICAL DISTORTION<br>
-                > NOISE = TRAFFIC/DRONE GLITCH
+            <div style="margin-top: 10px; font-size: 10px; color: #888; border-top: 1px solid #333; padding-top: 10px;">
+                > ADJUST SIGNAL PARAMETERS<br>
+                > MONITOR INTEGRITY<br>
+                > WARNING: AMPLITUDE > 1.0 CAUSES INSTABILITY
             </div>
         </div>
 
         <!-- CENTER: STATUS -->
         <div id="status-display">
-            <h1>CITY_OS // V9</h1>
-            <div id="system-state" style="color:#00ff41">OPERATIONAL</div>
-            <div style="font-size:11px; color:#666; margin-top:4px;" id="clock-display">00:00:00</div>
+            <h1>CITY_OS // V1</h1>
+            <div id="system-state">SYSTEM STABLE</div>
         </div>
 
-        <!-- LOG -->
-        <div id="log-panel">
-            <div class="log-entry">> KERNEL INITIALIZED...</div>
-        </div>
-
-        <!-- RIGHT: TELEMETRY -->
+        <!-- RIGHT PANEL: TELEMETRY -->
         <div class="panel" style="grid-column: 3; grid-row: 2; align-self: center;">
-            <h3>SECTOR STATUS</h3>
+            <h3>System Telemetry</h3>
             
             <div class="metric">
                 <span>SYSTEM INTEGRITY</span>
@@ -290,21 +264,33 @@
             </div>
 
             <div class="metric">
-                <span>GLOBAL CHAOS</span>
-                <span id="val-chaos">0%</span>
+                <span>ENTITY SYNC</span>
+                <span id="val-sync">100%</span>
             </div>
             <div class="bar-container">
-                <div id="bar-chaos" class="bar-fill" style="width: 0%; background: #ffaa00;"></div>
+                <div id="bar-sync" class="bar-fill" style="width: 100%; background: #00f3ff;"></div>
             </div>
 
-            <div style="margin-top: 12px; margin-bottom: 6px; font-size: 10px; color: #888;">THERMAL LOAD (RESONANCE)</div>
-            <div id="zone-list"></div>
-
-            <div style="margin-top: auto; font-size: 10px; color: #666; border-top: 1px solid #333; padding-top:8px;">
-                POPULATION: <span id="entity-count" style="color:#fff">--</span><br>
-                DRONES: <span id="drone-count" style="color:#fff">--</span><br>
-                TRAFFIC: <span id="traffic-count" style="color:#fff">--</span>
+            <div class="metric">
+                <span>LOCAL ENTROPY</span>
+                <span id="val-entropy">0%</span>
             </div>
+            <div class="bar-container">
+                <div id="bar-entropy" class="bar-fill" style="background: var(--alert); width: 0%;"></div>
+            </div>
+
+            <div style="margin-top: auto; font-family: monospace; font-size: 10px; color: #ccc;">
+                <p>> CONNECTED TO NODE_01</p>
+                <p>> DRONES ACTIVE: <span id="drone-count">--</span></p>
+                <p>> TRAFFIC ACTIVE: <span id="traffic-count">--</span></p>
+                <p>> SIGNAL STRENGTH: <span id="signal-str">NORMAL</span></p>
+            </div>
+        </div>
+
+        <div id="instructions">
+            <strong>OPERATOR MANUAL:</strong><br>
+            Left Click + Drag to Rotate Camera | Scroll to Zoom<br>
+            Balance the signal. High Power creates movement but risks collapse.
         </div>
     </div>
 
@@ -316,753 +302,441 @@
         import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
         import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
         import { GlitchPass } from 'three/addons/postprocessing/GlitchPass.js';
+        import { createNoise3D } from 'https://unpkg.com/simplex-noise@4.0.1/dist/esm/simplex-noise.js';
 
-        // --- LOGGER ---
-        const Logger = {
-            el: document.getElementById('log-panel'),
-            lines: [],
-            log(msg, type='normal') {
-                const span = document.createElement('div');
-                span.className = 'log-entry ' + (type === 'warn' ? 'log-warn' : type === 'crit' ? 'log-crit' : type === 'success' ? 'log-success' : '');
-                span.innerText = `> ${msg}`;
-                this.el.prepend(span);
-                if(this.el.children.length > 8) this.el.lastElementChild.remove();
-            }
-        };
-
-        // --- GAME STATE ---
+        // --- GAME STATE & CONFIG ---
         const state = {
             freq: 1.0,
             amp: 0.3,
-            noise: 0.1,
+            noise: 0.2,
             vector: 0,
             integrity: 100,
-            chaos: 0,
+            sync: 100,
+            entropy: 0,
             time: 0,
-            frame: 0
+            isCrashed: false
         };
 
         const config = {
-            citySize: 250,
+            citySize: 200,
             buildingCount: 600,
-            workerCount: 200,
-            trafficCount: 400,
-            droneCount: 60,
-            elevatorCount: 150,
-            zones: [
-                { id: 0, name: 'ALPHA', freq: 2.0, color: 0x00ff41, range: 0.25, heat: 0 },
-                { id: 1, name: 'BETA',  freq: 4.5, color: 0x00f3ff, range: 0.25, heat: 0 },
-                { id: 2, name: 'GAMMA', freq: 6.0, color: 0xffaa00, range: 0.25, heat: 0 },
-                { id: 3, name: 'DELTA', freq: 8.5, color: 0xff003c, range: 0.25, heat: 0 }
-            ]
-        };
-
-        // --- AUDIO ENGINE ---
-        const AudioEngine = {
-            ctx: null, osc: null, gain: null, noiseGain: null, initialized: false,
-            init() {
-                if(this.initialized) return;
-                try {
-                    const AC = window.AudioContext || window.webkitAudioContext;
-                    this.ctx = new AC();
-                    this.osc = this.ctx.createOscillator();
-                    this.osc.type = 'sawtooth';
-                    this.osc.frequency.value = 100;
-                    
-                    const filter = this.ctx.createBiquadFilter();
-                    filter.type = 'lowpass';
-                    filter.frequency.value = 400;
-
-                    this.gain = this.ctx.createGain();
-                    this.gain.gain.value = 0.05;
-
-                    this.osc.connect(filter).connect(this.gain).connect(this.ctx.destination);
-                    this.osc.start();
-
-                    const bufferSize = 4096;
-                    const noiseNode = this.ctx.createScriptProcessor(bufferSize, 1, 1);
-                    noiseNode.onaudioprocess = (e) => {
-                        const out = e.outputBuffer.getChannelData(0);
-                        for (let i = 0; i < bufferSize; i++) out[i] = Math.random() * 2 - 1;
-                    };
-                    this.noiseGain = this.ctx.createGain();
-                    this.noiseGain.gain.value = 0;
-                    noiseNode.connect(this.noiseGain).connect(this.ctx.destination);
-
-                    this.initialized = true;
-                    document.getElementById('btn-audio').innerText = "AUDIO ACTIVE";
-                    document.getElementById('btn-audio').classList.add('btn-active');
-                    Logger.log("AUDIO ENGINE: ONLINE", "success");
-                } catch(e) { Logger.log("AUDIO INIT FAILED", "crit"); }
-            },
-            update(f, a, n) {
-                if(!this.initialized) return;
-                this.osc.frequency.setTargetAtTime(50 + f * 30, this.ctx.currentTime, 0.1);
-                this.gain.gain.setTargetAtTime(a * 0.08, this.ctx.currentTime, 0.1);
-                this.noiseGain.gain.setTargetAtTime(n * 0.15, this.ctx.currentTime, 0.1);
+            droneCount: 150,
+            trafficCount: 300,
+            colors: {
+                neonGreen: 0x00ff41,
+                neonRed: 0xff003c,
+                neonBlue: 0x00f3ff,
+                darkBase: 0x020202
             }
         };
 
-        const MicInput = {
-            active: false, analyser: null, data: null,
-            init() {
-                if(this.active) return;
-                navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
-                    if(!AudioEngine.ctx) AudioEngine.init();
-                    const src = AudioEngine.ctx.createMediaStreamSource(stream);
-                    this.analyser = AudioEngine.ctx.createAnalyser();
-                    this.analyser.fftSize = 64;
-                    src.connect(this.analyser);
-                    this.data = new Uint8Array(this.analyser.frequencyBinCount);
-                    this.active = true;
-                    document.getElementById('btn-mic').innerText = "MIC LINKED";
-                    document.getElementById('btn-mic').classList.add('btn-active');
-                    document.getElementById('btn-mic').classList.remove('btn-alert');
-                    Logger.log("EXTERNAL FEED LINKED", "success");
-                }).catch(() => Logger.log("MIC ACCESS DENIED", "crit"));
-            },
-            getLevel() {
-                if(!this.active) return 0;
-                this.analyser.getByteFrequencyData(this.data);
-                let sum = 0;
-                for(let i=0; i<this.data.length; i++) sum += this.data[i];
-                return sum / this.data.length / 255;
-            }
-        };
+        document.getElementById('drone-count').innerText = config.droneCount;
+        document.getElementById('traffic-count').innerText = config.trafficCount;
+
+        const noise3D = createNoise3D();
 
         // --- THREE.JS SETUP ---
         const container = document.getElementById('canvas-container');
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x020202);
-        scene.fog = new THREE.FogExp2(0x020202, 0.006);
+        scene.background = new THREE.Color(config.colors.darkBase);
+        scene.fog = new THREE.FogExp2(config.colors.darkBase, 0.008);
 
-        const d = 120;
+        // Isometric Camera Setup
         const aspect = window.innerWidth / window.innerHeight;
+        const d = 80;
         const camera = new THREE.OrthographicCamera(-d * aspect, d * aspect, d, -d, 1, 1000);
-        camera.position.set(100, 100, 100);
-        camera.lookAt(0, 0, 0);
+        
+        // Initial isometric position
+        camera.position.set(100, 100, 100); 
+        camera.lookAt(scene.position);
 
         const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: "high-performance" });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         container.appendChild(renderer.domElement);
 
-        // --- GLOBAL UNIFORMS FOR SHADERS ---
-        const globalUniforms = {
-            uTime: { value: 0 },
-            uSignalParams: { value: new THREE.Vector3(1.0, 0.3, 0.1) }, // x:freq, y:amp, z:noise
-            uVector: { value: new THREE.Vector2(0, 1) }
-        };
-
-        // --- SIMPLEX NOISE & MATERIAL INJECTION ---
-        const snoiseGLSL = `
-        vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
-        vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
-        vec4 permute(vec4 x) { return mod289(((x*34.0)+1.0)*x); }
-        vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
-        float snoise(vec3 v) {
-            const vec2  C = vec2(1.0/6.0, 1.0/3.0) ;
-            const vec4  D = vec4(0.0, 0.5, 1.0, 2.0);
-            vec3 i  = floor(v + dot(v, C.yyy) );
-            vec3 x0 = v - i + dot(i, C.xxx) ;
-            vec3 g = step(x0.yzx, x0.xyz);
-            vec3 l = 1.0 - g;
-            vec3 i1 = min( g.xyz, l.zxy );
-            vec3 i2 = max( g.xyz, l.zxy );
-            vec3 x1 = x0 - i1 + C.xxx;
-            vec3 x2 = x0 - i2 + C.yyy;
-            vec3 x3 = x0 - D.yyy;
-            i = mod289(i);
-            vec4 p = permute( permute( permute(
-                        i.z + vec4(0.0, i1.z, i2.z, 1.0 ))
-                    + i.y + vec4(0.0, i1.y, i2.y, 1.0 ))
-                    + i.x + vec4(0.0, i1.x, i2.x, 1.0 ));
-            float n_ = 0.142857142857;
-            vec3  ns = n_ * D.wyz - D.xzx;
-            vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
-            vec4 x_ = floor(j * ns.z);
-            vec4 y_ = floor(j - 7.0 * x_ );
-            vec4 x = x_ *ns.x + ns.yyyy;
-            vec4 y = y_ *ns.x + ns.yyyy;
-            vec4 h = 1.0 - abs(x) - abs(y);
-            vec4 b0 = vec4( x.xy, y.xy );
-            vec4 b1 = vec4( x.zw, y.zw );
-            vec4 s0 = floor(b0)*2.0 + 1.0;
-            vec4 s1 = floor(b1)*2.0 + 1.0;
-            vec4 sh = -step(h, vec4(0.0));
-            vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy ;
-            vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww ;
-            vec3 p0 = vec3(a0.xy,h.x);
-            vec3 p1 = vec3(a0.zw,h.y);
-            vec3 p2 = vec3(a1.xy,h.z);
-            vec3 p3 = vec3(a1.zw,h.w);
-            vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));
-            p0 *= norm.x; p1 *= norm.y; p2 *= norm.z; p3 *= norm.w;
-            vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
-            m = m * m;
-            return 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3) ) );
-        }
-        `;
-
-        function modifyMaterial(material) {
-            material.onBeforeCompile = (shader) => {
-                shader.uniforms.uTime = globalUniforms.uTime;
-                shader.uniforms.uSignalParams = globalUniforms.uSignalParams;
-                shader.uniforms.uVector = globalUniforms.uVector;
-
-                shader.vertexShader = `
-                    uniform float uTime;
-                    uniform vec3 uSignalParams;
-                    uniform vec2 uVector;
-                    ${snoiseGLSL}
-                ` + shader.vertexShader;
-
-                shader.vertexShader = shader.vertexShader.replace(
-                    '#include <begin_vertex>',
-                    `
-                    #include <begin_vertex>
-                    
-                    // Directional bias
-                    float dirDot = dot(normalize(transformed.xz), uVector);
-                    
-                    // Simplex Noise Wave
-                    float noiseScale = 0.05 * uSignalParams.x; // Freq determines detail
-                    float noiseSpeed = uTime * 0.5 + dirDot;
-                    float n = snoise(vec3(transformed.x * noiseScale, transformed.z * noiseScale, noiseSpeed));
-                    
-                    // Amplitude effect
-                    float amp = uSignalParams.y;
-                    float distort = n * amp * 3.0;
-                    
-                    // Glitch/Entropy
-                    float entropy = uSignalParams.z; // Noise param
-                    float glitch = 0.0;
-                    if(entropy > 0.05) {
-                        float gTime = floor(uTime * 20.0); // snapping time for digital glitch feel
-                        float gN = snoise(vec3(transformed.y * 0.5, gTime, 0.0));
-                        if(gN > (1.0 - entropy)) {
-                            glitch = (gN - 0.5) * amp * 5.0;
-                        }
-                    }
-
-                    // Apply
-                    transformed.y += distort + glitch;
-                    transformed.x += glitch * 0.5;
-                    transformed.z += glitch * 0.5;
-                    
-                    // Pulse based on Freq
-                    float pulse = sin(uTime * uSignalParams.x * 2.0) * amp * 0.1;
-                    transformed += normal * pulse;
-                    `
-                );
-            };
-            return material;
-        }
-
-        // --- ASSETS ---
-        const dummy = new THREE.Object3D();
-        const colorDummy = new THREE.Color();
-        
-        // Buildings
-        const bGeo = new THREE.BoxGeometry(1, 1, 1);
-        bGeo.translate(0, 0.5, 0);
-        const bMatBase = new THREE.MeshBasicMaterial({ color: 0x112211, wireframe: true, transparent: true, opacity: 0.15 });
-        const bMatActive = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true, transparent: true, opacity: 0.8 });
-        modifyMaterial(bMatBase);
-        modifyMaterial(bMatActive);
-
-        const meshBuildings = new THREE.InstancedMesh(bGeo, bMatBase, config.buildingCount);
-        const meshBuildingsActive = new THREE.InstancedMesh(bGeo, bMatActive, config.buildingCount);
-        meshBuildingsActive.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(config.buildingCount * 3), 3);
-        scene.add(meshBuildings);
-        scene.add(meshBuildingsActive);
-
-        // Workers (Pyramids)
-        const wGeo = new THREE.ConeGeometry(0.3, 0.8, 3);
-        wGeo.translate(0, 0.4, 0);
-        const wMat = new THREE.MeshBasicMaterial({ color: 0xffff00, wireframe: true });
-        modifyMaterial(wMat);
-        const meshWorkers = new THREE.InstancedMesh(wGeo, wMat, config.workerCount);
-        scene.add(meshWorkers);
-
-        // Traffic (Rectangles)
-        const tGeo = new THREE.BoxGeometry(1.5, 0.4, 0.6);
-        const tMat = new THREE.MeshBasicMaterial({ color: 0xff003c, wireframe: true });
-        modifyMaterial(tMat);
-        const meshTraffic = new THREE.InstancedMesh(tGeo, tMat, config.trafficCount);
-        scene.add(meshTraffic);
-
-        // Elevators (Small cubes)
-        const eGeo = new THREE.BoxGeometry(0.8, 0.8, 0.8);
-        const eMat = new THREE.MeshBasicMaterial({ color: 0x00ffff, wireframe: true });
-        modifyMaterial(eMat);
-        const meshElevators = new THREE.InstancedMesh(eGeo, eMat, config.elevatorCount);
-        scene.add(meshElevators);
-
-        // Drones
-        const dGeo = new THREE.ConeGeometry(0.5, 1.2, 4);
-        dGeo.rotateX(Math.PI/2);
-        const dMat = new THREE.MeshBasicMaterial({ color: 0xff00ff, wireframe: true });
-        modifyMaterial(dMat);
-        const meshDrones = new THREE.InstancedMesh(dGeo, dMat, config.droneCount);
-        scene.add(meshDrones);
-
-        // Traffic Lights (Spheres at intersections)
-        const tlGeo = new THREE.SphereGeometry(0.4, 4, 4);
-        const tlMat = new THREE.MeshBasicMaterial({ color: 0x00ff00 }); // Solid color
-        const meshLights = new THREE.InstancedMesh(tlGeo, tlMat, 100);
-        scene.add(meshLights);
-
-        // Signal Plane (Grid Scanner)
-        const gGeo = new THREE.PlaneGeometry(400, 400, 80, 80);
-        const gMat = new THREE.ShaderMaterial({
-            uniforms: {
-                uTime: globalUniforms.uTime,
-                uColor: { value: new THREE.Color(0x00ff41) },
-                uAmp: { value: 0 }
-            },
-            vertexShader: `
-                varying vec2 vUv;
-                uniform float uTime;
-                uniform float uAmp;
-                void main() {
-                    vUv = uv;
-                    vec3 pos = position;
-                    // Grid undulation
-                    float d = length(pos.xy);
-                    pos.z += sin(d * 0.1 - uTime * 2.0) * uAmp * 2.0;
-                    gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
-                }
-            `,
-            fragmentShader: `
-                varying vec2 vUv;
-                uniform float uTime;
-                uniform vec3 uColor;
-                uniform float uAmp;
-                void main() {
-                    float scan = fract(vUv.y * 3.0 - uTime * 0.3);
-                    float line = smoothstep(0.48, 0.5, scan) - smoothstep(0.5, 0.52, scan);
-                    float gx = step(0.98, fract(vUv.x * 80.0));
-                    float gy = step(0.98, fract(vUv.y * 80.0));
-                    float grid = max(gx, gy);
-                    float alpha = grid * 0.08 + line * uAmp * 0.4;
-                    gl_FragColor = vec4(uColor, alpha);
-                }
-            `,
-            transparent: true,
-            depthWrite: false,
-            side: THREE.DoubleSide
-        });
-        const gridPlane = new THREE.Mesh(gGeo, gMat);
-        gridPlane.rotation.x = -Math.PI/2;
-        gridPlane.position.y = 0.1;
-        scene.add(gridPlane);
-
-        // --- CITY GEN ---
-        const buildings = [];
-        const zoneEls = document.getElementById('zone-list');
-        config.zones.forEach(z => {
-            const el = document.createElement('div');
-            el.className = 'zone-indicator';
-            el.id = `zone-ui-${z.id}`;
-            el.innerHTML = `
-                <div style="width:100%">
-                    <div style="display:flex; justify-content:space-between">
-                        <span>${z.name}</span>
-                        <span>${z.freq}Hz</span>
-                    </div>
-                    <div class="heat-bar"><div class="heat-fill" id="heat-bar-${z.id}"></div></div>
-                </div>
-            `;
-            zoneEls.appendChild(el);
-        });
-
-        let bIdx = 0;
-        // Generate zones
-        for(let z=0; z<4; z++) {
-            const zX = (z % 2 === 0 ? 1 : -1) * 70;
-            const zZ = (z < 2 ? 1 : -1) * 70;
-            const count = config.buildingCount / 4;
-            
-            for(let i=0; i<count; i++) {
-                const x = zX + (Math.random()-0.5)*110;
-                const zPos = zZ + (Math.random()-0.5)*110;
-                
-                // Snap to grid for nice streets
-                const snapX = Math.round(x / 5) * 5;
-                const snapZ = Math.round(zPos / 5) * 5;
-
-                if(Math.abs(snapX) < 10 || Math.abs(snapZ) < 10) continue; // Hollow center
-                
-                const h = Math.random() * 30 + 5;
-                const w = Math.random() * 4 + 2;
-                
-                dummy.position.set(snapX, 0, snapZ);
-                dummy.scale.set(w, h, w);
-                dummy.updateMatrix();
-                
-                meshBuildings.setMatrixAt(bIdx, dummy.matrix);
-                
-                const isActive = Math.random() > 0.4;
-                if(isActive) {
-                    meshBuildingsActive.setMatrixAt(bIdx, dummy.matrix);
-                    meshBuildingsActive.setColorAt(bIdx, new THREE.Color(config.zones[z].color));
-                } else {
-                    dummy.scale.set(0,0,0);
-                    dummy.updateMatrix();
-                    meshBuildingsActive.setMatrixAt(bIdx, dummy.matrix);
-                }
-                
-                buildings.push({ id: bIdx, x: snapX, z: snapZ, h, w, zone: z, active: isActive });
-                bIdx++;
-            }
-        }
-
-        // Init Workers
-        const workers = [];
-        for(let i=0; i<config.workerCount; i++) {
-            workers.push({
-                x: (Math.random()-0.5)*config.citySize,
-                z: (Math.random()-0.5)*config.citySize,
-                tx: 0, tz: 0, speed: Math.random()*0.2+0.1
-            });
-        }
-
-        // Init Traffic
-        const traffic = [];
-        for(let i=0; i<config.trafficCount; i++) {
-            const axis = Math.random() > 0.5 ? 'x' : 'z';
-            const lane = Math.round(((Math.random()-0.5)*config.citySize)/5)*5 + 2.5; // Offset to sit in street
-            const pos = (Math.random()-0.5)*config.citySize;
-            traffic.push({
-                axis, lane, pos, 
-                speed: (Math.random()*0.3 + 0.2) * (Math.random()>0.5?1:-1)
-            });
-        }
-
-        // Init Elevators
-        const elevators = [];
-        const activeBuildings = buildings.filter(b => b.active);
-        for(let i=0; i<config.elevatorCount; i++) {
-            const b = activeBuildings[Math.floor(Math.random()*activeBuildings.length)];
-            elevators.push({
-                bx: b.x, bz: b.z, h: b.h, w: b.w,
-                y: Math.random() * b.h,
-                speed: Math.random() * 0.1 + 0.05,
-                offset: Math.random() * Math.PI * 2
-            });
-        }
-        
-        // Init Drones
-        const drones = [];
-        for(let i=0; i<config.droneCount; i++) {
-            drones.push({
-                x: (Math.random()-0.5)*config.citySize,
-                z: (Math.random()-0.5)*config.citySize,
-                y: 20 + Math.random()*15,
-                angle: Math.random()*Math.PI*2,
-                state: 'scan'
-            });
-        }
-        
-        // Init Lights
-        const lights = [];
-        let lIdx = 0;
-        for(let x=-100; x<=100; x+=50) {
-            for(let z=-100; z<=100; z+=50) {
-                if(lIdx >= 100) break;
-                lights.push({x, z, state: 0});
-                dummy.position.set(x, 1, z);
-                dummy.scale.set(1,1,1);
-                dummy.updateMatrix();
-                meshLights.setMatrixAt(lIdx, dummy.matrix);
-                lIdx++;
-            }
-        }
-
         // --- POST PROCESSING ---
         const composer = new EffectComposer(renderer);
         const renderPass = new RenderPass(scene, camera);
         composer.addPass(renderPass);
-        
-        const bloom = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
-        bloom.strength = 1.2; bloom.radius = 0.5; bloom.threshold = 0.1;
-        composer.addPass(bloom);
-        
-        const glitch = new GlitchPass();
-        glitch.enabled = false;
-        composer.addPass(glitch);
 
-        // --- LOOP ---
-        document.getElementById('entity-count').innerText = config.workerCount + config.droneCount + config.trafficCount;
-        document.getElementById('drone-count').innerText = config.droneCount;
-        document.getElementById('traffic-count').innerText = config.trafficCount;
+        // Bloom for Neon look
+        const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
+        bloomPass.threshold = 0.1;
+        bloomPass.strength = 1.5; // High bloom for neon
+        bloomPass.radius = 0.5;
+        composer.addPass(bloomPass);
 
+        // Glitch for failure states
+        const glitchPass = new GlitchPass();
+        glitchPass.goWild = false;
+        glitchPass.enabled = false;
+        composer.addPass(glitchPass);
+
+        // --- ASSETS & MATERIALS ---
+        
+        const buildingGeo = new THREE.BoxGeometry(1, 1, 1);
+        buildingGeo.translate(0, 0.5, 0); // Pivot at bottom
+
+        const buildingMat = new THREE.MeshBasicMaterial({ 
+            color: 0x004400, 
+            wireframe: true,
+            transparent: true,
+            opacity: 0.15
+        });
+
+        // Buildings that light up
+        const buildingActiveMat = new THREE.MeshBasicMaterial({
+            color: config.colors.neonGreen,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.6
+        });
+
+        const buildings = new THREE.InstancedMesh(buildingGeo, buildingMat, config.buildingCount);
+        const buildingsActive = new THREE.InstancedMesh(buildingGeo, buildingActiveMat, config.buildingCount);
+        
+        scene.add(buildings);
+        scene.add(buildingsActive);
+
+        // --- SCENE GENERATION ---
+        
+        const buildingData = [];
+        const dummy = new THREE.Object3D();
+
+        function generateCity() {
+            for (let i = 0; i < config.buildingCount; i++) {
+                // Random position with exclusion zone in center
+                let x, z;
+                do {
+                    x = (Math.random() - 0.5) * config.citySize;
+                    z = (Math.random() - 0.5) * config.citySize;
+                } while (Math.abs(x) < 15 && Math.abs(z) < 15);
+
+                // Height varies
+                const h = Math.random() * 20 + 5;
+                const w = Math.random() * 4 + 2;
+                const d = Math.random() * 4 + 2;
+
+                dummy.position.set(x, 0, z);
+                dummy.scale.set(w, h, d);
+                dummy.updateMatrix();
+
+                buildings.setMatrixAt(i, dummy.matrix);
+                
+                // Only some buildings are "Active" (neon outlines)
+                if (Math.random() > 0.7) {
+                    buildingsActive.setMatrixAt(i, dummy.matrix);
+                } else {
+                    // Hide unused instances in the active mesh
+                    dummy.scale.set(0,0,0);
+                    dummy.updateMatrix();
+                    buildingsActive.setMatrixAt(i, dummy.matrix);
+                }
+
+                buildingData.push({
+                    x, z, h, w, d,
+                    baseScale: { w, h, d },
+                    id: i
+                });
+            }
+            buildings.instanceMatrix.needsUpdate = true;
+            buildingsActive.instanceMatrix.needsUpdate = true;
+        }
+        generateCity();
+
+
+        // SIGNAL PLANE (Ground Visualizer)
+        const signalGeo = new THREE.PlaneGeometry(300, 300, 100, 100);
+        const signalMat = new THREE.ShaderMaterial({
+            uniforms: {
+                uTime: { value: 0 },
+                uFreq: { value: state.freq },
+                uAmp: { value: state.amp },
+                uColor: { value: new THREE.Color(config.colors.neonGreen) }
+            },
+            vertexShader: `
+                varying float vElev;
+                uniform float uTime;
+                uniform float uFreq;
+                uniform float uAmp;
+                
+                // Simplex noise function for shader (simplified)
+                vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+                vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+                vec3 permute(vec3 x) { return mod289(((x*34.0)+1.0)*x); }
+                float snoise(vec2 v) {
+                    const vec4 C = vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439);
+                    vec2 i  = floor(v + dot(v, C.yy) );
+                    vec2 x0 = v - i + dot(i, C.xx);
+                    vec2 i1; i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+                    vec4 x12 = x0.xyxy + C.xxzz;
+                    x12.xy -= i1;
+                    i = mod289(i);
+                    vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 )) + i.x + vec3(0.0, i1.x, 1.0 ));
+                    vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
+                    m = m*m ;
+                    m = m*m ;
+                    vec3 x = 2.0 * fract(p * C.www) - 1.0;
+                    vec3 h = abs(x) - 0.5;
+                    vec3 ox = floor(x + 0.5);
+                    vec3 a0 = x - ox;
+                    m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );
+                    vec3 g;
+                    g.x  = a0.x  * x0.x  + h.x  * x0.y;
+                    g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+                    return 130.0 * dot(m, g);
+                }
+
+                void main() {
+                    vec3 pos = position;
+                    float noiseVal = snoise(uv * 10.0 * uFreq + uTime * 0.5);
+                    pos.z += noiseVal * 5.0 * uAmp;
+                    vElev = pos.z;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+                }
+            `,
+            fragmentShader: `
+                varying float vElev;
+                uniform vec3 uColor;
+                
+                void main() {
+                    float alpha = smoothstep(-2.0, 5.0, vElev);
+                    gl_FragColor = vec4(uColor, alpha * 0.3);
+                }
+            `,
+            transparent: true,
+            wireframe: true
+        });
+
+        const signalPlane = new THREE.Mesh(signalGeo, signalMat);
+        signalPlane.rotation.x = -Math.PI / 2;
+        signalPlane.position.y = -0.5;
+        scene.add(signalPlane);
+
+
+        // DYNAMIC AGENTS (Points)
+        const droneGeo = new THREE.BufferGeometry();
+        const dronePos = new Float32Array(config.droneCount * 3);
+        const droneData = [];
+        
+        for (let i = 0; i < config.droneCount; i++) {
+            const x = (Math.random() - 0.5) * config.citySize;
+            const y = Math.random() * 20 + 10;
+            const z = (Math.random() - 0.5) * config.citySize;
+            dronePos[i*3] = x;
+            dronePos[i*3+1] = y;
+            dronePos[i*3+2] = z;
+            
+            droneData.push({ 
+                baseY: y, 
+                offset: Math.random() * 100,
+                speed: Math.random() * 0.5 + 0.2
+            });
+        }
+        droneGeo.setAttribute('position', new THREE.BufferAttribute(dronePos, 3));
+        const droneMat = new THREE.PointsMaterial({ color: config.colors.neonBlue, size: 0.8, transparent: true });
+        const drones = new THREE.Points(droneGeo, droneMat);
+        scene.add(drones);
+
+
+        // --- INTERACTION ---
         function updateUI() {
             state.freq = parseFloat(document.getElementById('inp-freq').value);
-            // Mic Override
-            if(MicInput.active) {
-                const vol = MicInput.getLevel();
-                if(vol > 0.1) {
-                    const base = parseFloat(document.getElementById('inp-amp').value);
-                    state.amp = Math.min(2.0, base + vol * 4.0);
-                } else {
-                    state.amp = parseFloat(document.getElementById('inp-amp').value);
-                }
-            } else {
-                state.amp = parseFloat(document.getElementById('inp-amp').value);
-            }
+            state.amp = parseFloat(document.getElementById('inp-amp').value);
             state.noise = parseFloat(document.getElementById('inp-noise').value);
             state.vector = parseFloat(document.getElementById('inp-vec').value);
-            
+
             document.getElementById('val-freq').innerText = state.freq.toFixed(1);
             document.getElementById('val-amp').innerText = state.amp.toFixed(2);
             document.getElementById('val-noise').innerText = state.noise.toFixed(2);
-            document.getElementById('val-vec').innerText = state.vector;
-            
-            // Update Uniforms
-            globalUniforms.uSignalParams.value.set(state.freq, state.amp, state.noise);
-            const rad = state.vector * Math.PI / 180;
-            globalUniforms.uVector.value.set(Math.sin(rad), Math.cos(rad));
-            
-            AudioEngine.update(state.freq, state.amp, state.noise);
+            document.getElementById('val-vec').innerText = state.vector.toFixed(0);
         }
-        ['inp-freq', 'inp-amp', 'inp-noise', 'inp-vec'].forEach(id => document.getElementById(id).addEventListener('input', updateUI));
 
-        document.getElementById('btn-audio').addEventListener('click', () => AudioEngine.init());
-        document.getElementById('btn-mic').addEventListener('click', () => MicInput.init());
+        ['inp-freq', 'inp-amp', 'inp-noise', 'inp-vec'].forEach(id => {
+            document.getElementById(id).addEventListener('input', updateUI);
+        });
 
-        setInterval(() => {
-            const now = new Date();
-            document.getElementById('clock-display').innerText = now.toLocaleTimeString();
-        }, 1000);
+        // Mouse Rotation
+        let targetRotationX = 0;
+        let targetRotationY = 0;
+        let isDragging = false;
+        let previousMousePosition = { x: 0, y: 0 };
 
+        document.addEventListener('mousedown', () => isDragging = true);
+        document.addEventListener('mouseup', () => isDragging = false);
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                const deltaMove = {
+                    x: e.offsetX - previousMousePosition.x,
+                    y: e.offsetY - previousMousePosition.y
+                };
+                targetRotationX -= deltaMove.x * 0.005;
+                targetRotationY -= deltaMove.y * 0.005;
+            }
+            previousMousePosition = { x: e.offsetX, y: e.offsetY };
+        });
+
+
+        // --- MAIN LOOP ---
         function animate() {
             requestAnimationFrame(animate);
-            if(MicInput.active) updateUI();
+
+            const dt = 0.016;
+            state.time += dt;
+
+            // 1. STATE SIMULATION
             
-            state.time += 0.01;
-            globalUniforms.uTime.value = state.time;
+            // Calculate Load
+            const load = state.freq * state.amp; // 0 to ~12
             
-            // CAM SHAKE
-            if(state.amp > 0.5 || state.noise > 0.3) {
-                const shake = (state.amp * 0.1 + state.noise * 0.2) * 0.5;
+            // Integrity Logic
+            if (load > 4.0 || state.entropy > 80) {
+                state.integrity -= (load - 3.0) * 0.05 * (1 + state.noise);
+            } else {
+                state.integrity += 0.1; // Recovery
+            }
+            state.integrity = THREE.MathUtils.clamp(state.integrity, 0, 100);
+
+            // Entropy Logic (Chaos)
+            // High noise increases entropy. Low integrity increases entropy.
+            let entropyTarget = state.noise * 100 + (100 - state.integrity) * 0.5;
+            state.entropy += (entropyTarget - state.entropy) * 0.05;
+
+            // Sync Logic
+            state.sync = 100 - state.entropy;
+
+            // Visual Status Updates
+            const dangerLevel = 1 - (state.integrity / 100);
+            
+            // Update Bars
+            document.getElementById('bar-integrity').style.width = state.integrity + '%';
+            document.getElementById('bar-integrity').style.backgroundColor = state.integrity < 30 ? config.colors.neonRed : config.colors.neonGreen;
+            
+            document.getElementById('bar-sync').style.width = state.sync + '%';
+            document.getElementById('bar-entropy').style.width = state.entropy + '%';
+
+            // Crash State
+            const statusEl = document.getElementById('system-state');
+            if (state.integrity < 10) {
+                state.isCrashed = true;
+                statusEl.innerText = "SYSTEM CRITICAL // FAILURE";
+                statusEl.style.color = "#ff003c";
+                statusEl.classList.add('blinking');
+                glitchPass.enabled = true;
+                glitchPass.goWild = true;
+            } else {
+                state.isCrashed = false;
+                statusEl.innerText = "SYSTEM CONNECTED";
+                statusEl.style.color = "#00ff41";
+                statusEl.classList.remove('blinking');
+                glitchPass.enabled = state.integrity < 50;
+                glitchPass.goWild = false;
+            }
+
+            // Update Shader Uniforms
+            signalMat.uniforms.uTime.value = state.time;
+            signalMat.uniforms.uFreq.value = state.freq;
+            signalMat.uniforms.uAmp.value = state.amp;
+            
+            // Color shift on danger
+            const baseColor = new THREE.Color(config.colors.neonGreen);
+            const dangerColor = new THREE.Color(config.colors.neonRed);
+            signalMat.uniforms.uColor.value.lerpColors(baseColor, dangerColor, dangerLevel);
+
+
+            // 2. ENTITY UPDATES
+            
+            // Vector Bias
+            const rad = state.vector * (Math.PI / 180);
+            const biasX = Math.sin(rad) * state.amp * 0.5;
+            const biasZ = Math.cos(rad) * state.amp * 0.5;
+
+            // Building Vibration
+            if (state.amp > 0.5) {
+                const shake = (state.amp - 0.5) * 0.2;
+                for (let i = 0; i < config.buildingCount; i++) {
+                    const b = buildingData[i];
+                    dummy.position.set(b.x, 0, b.z);
+                    const scaleNoise = noise3D(b.x, state.time * state.freq * 2, b.z);
+                    dummy.scale.set(
+                        b.baseScale.w, 
+                        b.baseScale.h * (1 + scaleNoise * shake), 
+                        b.baseScale.d
+                    );
+                    dummy.updateMatrix();
+                    buildingsActive.setMatrixAt(i, dummy.matrix);
+                }
+                buildingsActive.instanceMatrix.needsUpdate = true;
+            }
+
+            // Drones Logic
+            const pos = drones.geometry.attributes.position.array;
+            for(let i=0; i<config.droneCount; i++) {
+                const idx = i*3;
+                let x = pos[idx];
+                let y = pos[idx+1];
+                let z = pos[idx+2];
+                const d = droneData[i];
+
+                // Noise Field Force
+                const n = noise3D(x * 0.02, z * 0.02, state.time * state.freq * 0.2);
+                
+                // Movement
+                x += Math.cos(d.offset + state.time) * 0.1 + biasX;
+                z += Math.sin(d.offset + state.time) * 0.1 + biasZ;
+                
+                // Chaos from Noise input
+                x += (Math.random()-0.5) * state.noise;
+                z += (Math.random()-0.5) * state.noise;
+
+                // Signal Wave Height reaction
+                y = d.baseY + n * state.amp * 10;
+
+                // Wrap
+                if(x>100) x=-100; if(x<-100) x=100;
+                if(z>100) z=-100; if(z<-100) z=100;
+
+                pos[idx] = x;
+                pos[idx+1] = y;
+                pos[idx+2] = z;
+            }
+            drones.geometry.attributes.position.needsUpdate = true;
+
+
+            // 3. CAMERA ORBIT
+            // Smoothly interpolate camera position based on rotation
+            const radius = 150;
+            const camX = Math.sin(targetRotationX) * radius;
+            const camZ = Math.cos(targetRotationX) * radius;
+            const camY = Math.max(50, 100 + targetRotationY * 50);
+
+            camera.position.x += (camX - camera.position.x) * 0.1;
+            camera.position.z += (camZ - camera.position.z) * 0.1;
+            camera.position.y += (camY - camera.position.y) * 0.1;
+            camera.lookAt(0, 0, 0);
+
+            // Camera Shake on low integrity
+            if (state.integrity < 60) {
+                const shake = (60 - state.integrity) * 0.01;
                 camera.position.x += (Math.random()-0.5)*shake;
                 camera.position.y += (Math.random()-0.5)*shake;
                 camera.position.z += (Math.random()-0.5)*shake;
             }
 
-            // LOGIC
-            let globalHeat = 0;
-            let hasResonance = false;
-            
-            config.zones.forEach((z, idx) => {
-                const diff = Math.abs(state.freq - z.freq);
-                const el = document.getElementById(`zone-ui-${z.id}`);
-                const bar = document.getElementById(`heat-bar-${z.id}`);
-                
-                // Resonance Check (strict)
-                const resonant = diff < 0.2 && state.amp > 0.2;
-                
-                if(resonant) {
-                    if(state.frame % 60 === 0 && Math.random() > 0.6) Logger.log(`${z.name} RESONANCE LOCKED`, "success");
-                    z.heat += 0.003 * state.amp;
-                    el.classList.add('zone-resonance');
-                    hasResonance = true;
-                    state.integrity += 0.05;
-                } else {
-                    el.classList.remove('zone-resonance');
-                    z.heat -= 0.005;
-                }
-                
-                // Active range
-                if(diff < z.range) {
-                    el.classList.add('zone-active');
-                    z.heat += 0.001 * state.amp;
-                } else {
-                    el.classList.remove('zone-active');
-                }
-                
-                if(z.heat > 0.8) {
-                    el.classList.add('zone-overheat');
-                    state.chaos += 0.3;
-                    state.integrity -= 0.15;
-                    if(Math.random() < 0.03) Logger.log(`WARNING: ${z.name} THERMAL CRITICAL`, "warn");
-                } else {
-                    el.classList.remove('zone-overheat');
-                }
-                
-                z.heat = Math.max(0, Math.min(1, z.heat));
-                bar.style.width = (z.heat * 100) + '%';
-                globalHeat += z.heat;
-            });
-            
-            // Global State
-            state.chaos += state.noise * 0.15;
-            if(!hasResonance && state.amp < 0.1) state.chaos += 0.03; // Entropy decay
-            if(hasResonance) state.chaos -= 0.05;
-            
-            state.integrity = Math.max(0, Math.min(100, state.integrity));
-            state.chaos = Math.max(0, Math.min(100, state.chaos));
-            
-            document.getElementById('bar-integrity').style.width = state.integrity + '%';
-            document.getElementById('bar-chaos').style.width = state.chaos + '%';
-            document.getElementById('val-integrity').innerText = Math.floor(state.integrity) + '%';
-            document.getElementById('val-chaos').innerText = Math.floor(state.chaos) + '%';
-            
-            const sysState = document.getElementById('system-state');
-            if(state.integrity < 20 || state.chaos > 90) {
-                sysState.innerText = "CRITICAL FAILURE";
-                sysState.style.color = "red";
-                glitch.enabled = true;
-                glitch.goWild = state.integrity <= 0;
-            } else {
-                sysState.innerText = hasResonance ? "HARMONIC LOCK" : "OPERATIONAL";
-                sysState.style.color = hasResonance ? "#fff" : "#00ff41";
-                glitch.enabled = false;
-            }
-
-            // ENTITY VECTORS
-            const vecX = Math.sin(state.vector * Math.PI / 180) * state.amp;
-            const vecZ = Math.cos(state.vector * Math.PI / 180) * state.amp;
-            
-            // Workers Update
-            for(let i=0; i<config.workerCount; i++) {
-                const w = workers[i];
-                const dx = w.tx - w.x; const dz = w.tz - w.z;
-                if(Math.sqrt(dx*dx + dz*dz) < 1 || Math.random() < 0.01) {
-                    w.tx = (Math.random()-0.5)*config.citySize;
-                    w.tz = (Math.random()-0.5)*config.citySize;
-                }
-                // Chaos makes them jitter
-                const jit = state.chaos > 50 ? (Math.random()-0.5)*0.5 : 0;
-                w.x += (dx*0.01 + vecX*0.2) * w.speed + jit;
-                w.z += (dz*0.01 + vecZ*0.2) * w.speed + jit;
-                dummy.position.set(w.x, 0.4, w.z);
-                dummy.scale.set(1,1,1);
-                dummy.updateMatrix();
-                meshWorkers.setMatrixAt(i, dummy.matrix);
-            }
-            meshWorkers.instanceMatrix.needsUpdate = true;
-            
-            // Traffic Update
-            for(let i=0; i<config.trafficCount; i++) {
-                const t = traffic[i];
-                t.pos += t.speed * (1 + state.amp); // Signal boosts speed
-                
-                // Wrap around
-                if(Math.abs(t.pos) > config.citySize/2) t.pos *= -1;
-                
-                // Glitch turn
-                if(state.noise > 0.5 && Math.random() < 0.05) t.speed *= -1;
-
-                if(t.axis === 'x') dummy.position.set(t.pos, 0.25, t.lane);
-                else dummy.position.set(t.lane, 0.25, t.pos);
-                
-                // Align rotation
-                dummy.rotation.set(0, t.axis === 'x' ? 0 : Math.PI/2, 0);
-                dummy.scale.set(1,1,1);
-                dummy.updateMatrix();
-                meshTraffic.setMatrixAt(i, dummy.matrix);
-            }
-            meshTraffic.instanceMatrix.needsUpdate = true;
-            
-            // Elevators Update
-            for(let i=0; i<config.elevatorCount; i++) {
-                const e = elevators[i];
-                // Move based on signal wave
-                e.y = (Math.sin(state.time * state.freq + e.offset) * 0.5 + 0.5) * e.h;
-                
-                // Attach to side of building
-                dummy.position.set(e.bx + e.w/2 + 0.5, e.y, e.bz);
-                dummy.scale.set(1,1,1);
-                dummy.updateMatrix();
-                meshElevators.setMatrixAt(i, dummy.matrix);
-            }
-            meshElevators.instanceMatrix.needsUpdate = true;
-
-            // Drones Update
-            for(let i=0; i<config.droneCount; i++) {
-                const d = drones[i];
-                if(state.noise > 0.6) d.state = 'glitch';
-                else if(globalHeat > 1.5) d.state = 'lock';
-                else d.state = 'scan';
-                
-                if(d.state === 'scan') {
-                    d.angle += 0.02;
-                    d.x += Math.cos(d.angle)*0.2 + vecX * 0.1;
-                    d.z += Math.sin(d.angle)*0.2 + vecZ * 0.1;
-                    dummy.rotation.y += 0.1;
-                    dummy.rotation.z = Math.sin(state.time * 5)*0.2;
-                } else if(d.state === 'lock') {
-                    d.x = d.x * 0.99 + vecX;
-                    d.z = d.z * 0.99 + vecZ;
-                    dummy.lookAt(0,0,0);
-                } else {
-                    d.x += (Math.random()-0.5);
-                    d.z += (Math.random()-0.5);
-                    d.y += (Math.random()-0.5);
-                }
-                
-                if(Math.abs(d.x) > 130) d.x *= -0.9;
-                if(Math.abs(d.z) > 130) d.z *= -0.9;
-                
-                dummy.position.set(d.x, d.y, d.z);
-                dummy.scale.set(1,1,1);
-                dummy.updateMatrix();
-                meshDrones.setMatrixAt(i, dummy.matrix);
-            }
-            meshDrones.instanceMatrix.needsUpdate = true;
-            
-            // Lights Update (Sync or Glitch)
-            const lightColor = new THREE.Color();
-            if(state.chaos < 20) {
-                // Sync Green
-                const blink = Math.sin(state.time * 4) > 0;
-                lightColor.setHex(blink ? 0x00ff00 : 0x003300);
-            } else if (state.chaos > 80) {
-                // Panic Red
-                const blink = Math.sin(state.time * 10) > 0;
-                lightColor.setHex(blink ? 0xff0000 : 0x000000);
-            } else {
-                // Random/Yellow
-                lightColor.setHex(0xffaa00);
-            }
-            
-            for(let i=0; i<100; i++) {
-                meshLights.setColorAt(i, lightColor);
-            }
-            meshLights.instanceColor.needsUpdate = true;
-
-            // Grid Plane
-            gMat.uniforms.uAmp.value = state.amp;
-            
             composer.render();
-            state.frame++;
         }
-        
-        // Mouse Cam
-        let isDrag = false, lx=0, ly=0;
-        let camAng = Math.PI/4;
-        let camH = 100;
-        document.addEventListener('mousedown', e=> { isDrag=true; lx=e.clientX; ly=e.clientY; });
-        document.addEventListener('mouseup', ()=>isDrag=false);
-        document.addEventListener('mousemove', e=> {
-            if(isDrag) {
-                camAng -= (e.clientX - lx) * 0.005;
-                camH += (e.clientY - ly) * 0.2;
-                camH = Math.max(20, Math.min(200, camH));
-                
-                camera.position.x = Math.sin(camAng)*camH;
-                camera.position.z = Math.cos(camAng)*camH;
-                camera.position.y = camH;
-                camera.lookAt(0,0,0);
-                lx=e.clientX; ly=e.clientY;
-            }
-        });
-        document.addEventListener('wheel', e => {
-            camera.zoom = Math.max(0.2, Math.min(4, camera.zoom - e.deltaY*0.002));
+
+        // Resize
+        window.addEventListener('resize', () => {
+            const aspect = window.innerWidth / window.innerHeight;
+            camera.left = -d * aspect;
+            camera.right = d * aspect;
+            camera.top = d;
+            camera.bottom = -d;
             camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            composer.setSize(window.innerWidth, window.innerHeight);
         });
 
         animate();
