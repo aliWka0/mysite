@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proje Detayı - İzometrik Bulmaca</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Roboto+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="TargetCursor.css">
+    <link rel="stylesheet" href="BlurText.css">
+    <link rel="stylesheet" href="Lightning.css">
+    <link rel="stylesheet" href="LogoLoop.css">
+    <link rel="stylesheet" href="CardNav.css">
+    <link rel="stylesheet" href="DecryptedText.css">
+    <link rel="stylesheet" href="Magnet.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        /* Specific Detail Page Styles */
+        .project-hero {
+            height: 60vh;
+            display: flex;
+            align-items: flex-end;
+            padding-bottom: 60px;
+            background: linear-gradient(to bottom, transparent, #000 90%), url('https://via.placeholder.com/1920x1080/111/333') no-repeat center center/cover;
+        }
+
+        .detail-content {
+            margin-top: -50px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px 0;
+        }
+
+        .meta-item h4 {
+            color: var(--accent-color);
+            margin-bottom: 5px;
+        }
+
+        .meta-item p {
+            color: #ccc;
+        }
+
+        .content-block {
+            margin-bottom: 50px;
+        }
+
+        .content-block h3 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+
+        .content-block p {
+            font-size: 1.1rem;
+            color: #ddd;
+            margin-bottom: 15px;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .gallery-item {
+            background: #222;
+            height: 300px;
+            border-radius: 12px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="animation-wrapper">
+        <canvas class="stagger-visualizer"></canvas>
+    </div>
+
+    <!-- Card Navigation -->
+    <div id="card-nav"></div>
+
+    <main>
+        <div class="project-hero">
+            <div class="container">
+                <h1 style="font-size: 4rem; text-shadow: 0 4px 20px rgba(0,0,0,0.8);">İzometrik Bulmaca Oyunu</h1>
+            </div>
+        </div>
+
+        <div class="container detail-content">
+            <div class="glass-card">
+                <!-- 1. Proje Özeti -->
+                <div class="content-block">
+                    <h2>Proje Özeti</h2>
+                    <p>Mekorama'dan esinlenilen bu projede, oyuncuların robot karakteri yöneterek 3D izometrik
+                        bulmacaları çözdüğü bir deneyim tasarladım. Amaç, sadece görsel bir kopya üretmek değil, sağlam
+                        bir voxel/grid tabanlı hareket sistemi ve etkileşimli fizik objeleri (motorlar, sliderlar)
+                        geliştirmekti.</p>
+                </div>
+
+                <!-- 2. Meta (Teknolojiler) -->
+                <div class="meta-grid">
+                    <div class="meta-item">
+                        <h4>Motor / Dil</h4>
+                        <p>Unity 2022, C#</p>
+                    </div>
+                    <div class="meta-item">
+                        <h4>Platform</h4>
+                        <p>PC, WebGL</p>
+                    </div>
+                    <div class="meta-item">
+                        <h4>Süre</h4>
+                        <p>3 Hafta</p>
+                    </div>
+                </div>
+
+                <!-- 3. Benim Katkım -->
+                <div class="content-block">
+                    <h3>Benim Katkım & Teknik Detaylar</h3>
+                    <p>Projenin tüm kod mimarisi ve seviye tasarım araçları tarafımca geliştirildi. Özellikle:</p>
+                    <ul>
+                        <li><strong>A* Pathfinding:</strong> 3D grid üzerinde karakterin engellere takılmadan en kısa
+                            yolu bulması.</li>
+                        <li><strong>Draggable Objeler:</strong> Oyuncunun mouse ile tutup sürükleyebildiği platform
+                            mekanikleri.</li>
+                        <li><strong>Voxel Render:</strong> Seviyelerin küplerden oluştuğu optimize edilmiş render
+                            yapısı.</li>
+                    </ul>
+                </div>
+
+                <!-- 4. Görseller -->
+                <div class="content-block">
+                    <h3>Görseller & Demo</h3>
+                    <div class="gallery-grid">
+                        <div class="gallery-item" style="background: #333"></div>
+                        <div class="gallery-item" style="background: #444"></div>
+                    </div>
+                </div>
+
+                <!-- 5. Linkler -->
+                <div class="content-block" style="text-align: center; margin-top: 60px;">
+                    <a href="#" class="btn btn-primary">GitHub Projesi</a>
+                    <a href="#" class="btn btn-secondary">Oynanabilir Demo</a>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Ali Valiyev - Yazılım Geliştirici</p>
+    </footer>
+
+    <script src="script.js"></script>
+    <script src="Lightning.js"></script>
+    <script src="BlurText.js"></script>
+    <script src="LogoLoop.js"></script>
+    <script src="Magnet.js"></script>
+    <script src="CardNav.js"></script>
+    <script src="TargetCursor.js"></script>
+</body>
+
+</html>

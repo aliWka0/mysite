@@ -1,0 +1,343 @@
+.card-nav-container {
+    position: fixed;
+    top: 1.5em;
+    left: 0;
+    right: 0;
+    width: 92%;
+    max-width: 950px;
+    margin: 0 auto;
+    z-index: 1000;
+    box-sizing: border-box;
+}
+
+.card-nav {
+    display: block;
+    height: 60px;
+    padding: 0;
+    /* Shiny Wet Metal Effect - Transparent State */
+    background: linear-gradient(180deg,
+            rgba(60, 60, 60, 0.15) 0%,
+            rgba(40, 40, 40, 0.2) 40%,
+            rgba(20, 20, 20, 0.25) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    /* Stronger top highlight for shine */
+    border-radius: 18px;
+    box-shadow:
+        0 10px 40px rgba(0, 0, 0, 0.6),
+        0 0 0 1px rgba(255, 255, 255, 0.05) inset,
+        0 1px 0 rgba(255, 255, 255, 0.1) inset;
+    /* Interior top shine */
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    position: relative;
+    overflow: hidden;
+    will-change: height;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, height 0.3s ease;
+    /* Added height transition here too */
+}
+
+.card-nav:hover {
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.card-nav.open {
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 12px 50px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+}
+
+.card-nav-top {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1rem 0 1.2rem;
+    z-index: 2;
+}
+
+/* Hamburger Menu */
+.hamburger-menu {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    gap: 6px;
+    border-radius: 12px;
+    transition: background-color 0.3s ease;
+}
+
+.hamburger-menu:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.hamburger-line {
+    width: 22px;
+    height: 2px;
+    background-color: #fff;
+    transition: transform 0.3s ease, opacity 0.2s ease;
+    transform-origin: center;
+    border-radius: 2px;
+}
+
+.hamburger-menu.open .hamburger-line:first-child {
+    transform: translateY(4px) rotate(45deg);
+}
+
+.hamburger-menu.open .hamburger-line:last-child {
+    transform: translateY(-4px) rotate(-45deg);
+}
+
+/* Logo */
+.logo-container {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.card-nav-logo {
+    font-weight: 800;
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+    color: #fff;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+}
+
+.card-nav-logo:hover {
+    text-shadow: 0 0 25px rgba(255, 255, 255, 0.4);
+}
+
+.card-nav-logo .dot {
+    color: #666;
+    transition: color 0.3s ease;
+}
+
+.card-nav-logo:hover .dot {
+    color: #fff;
+}
+
+/* CTA Button */
+.card-nav-cta-button {
+    background: #fff;
+    color: #000;
+    border: none;
+    border-radius: 10px;
+    padding: 0 1.4rem;
+    height: 40px;
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    text-transform: uppercase;
+}
+
+.card-nav-cta-button:hover {
+    background: #e0e0e0;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 255, 255, 0.15);
+}
+
+/* Content Area */
+.card-nav-content {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 60px;
+    bottom: 0;
+    padding: 0.4rem 0.6rem 0.6rem 0.6rem;
+    display: flex;
+    align-items: stretch;
+    gap: 8px;
+    visibility: hidden;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.card-nav.open .card-nav-content {
+    visibility: visible;
+    pointer-events: auto;
+}
+
+/* Nav Cards */
+.nav-card {
+    flex: 1 1 0;
+    min-width: 0;
+    border-radius: 14px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 14px 20px;
+    gap: 10px;
+    user-select: none;
+    opacity: 0;
+    transform: translateY(25px);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.nav-card:hover {
+    background-color: rgba(60, 60, 60, 0.95) !important;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.nav-card-label {
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: #666;
+    text-transform: uppercase;
+}
+
+.nav-card-links {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.nav-card-link {
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    color: #fff;
+    transition: all 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0;
+    position: relative;
+    letter-spacing: 0.5px;
+}
+
+.nav-card-link::before {
+    content: '→';
+    font-size: 12px;
+    opacity: 0;
+    transform: translateX(-8px);
+    transition: all 0.25s ease;
+    color: #888;
+}
+
+.nav-card-link:hover::before {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.nav-card-link:hover {
+    padding-left: 18px;
+    color: #fff;
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+    .card-nav-container {
+        width: 95%;
+        top: 1em;
+    }
+
+    .card-nav-top {
+        padding: 0 0.8rem;
+    }
+
+    .hamburger-menu {
+        order: 1;
+    }
+
+    .logo-container {
+        position: static;
+        transform: none;
+        order: 2;
+        flex: 1;
+        justify-content: center;
+    }
+
+    .card-nav-cta-button {
+        order: 3;
+        padding: 0 1rem;
+        font-size: 0.7rem;
+    }
+
+    .card-nav-content {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+        padding: 0.5rem;
+        justify-content: flex-start;
+    }
+
+    .nav-card {
+        height: auto;
+        min-height: 50px;
+        flex: 0 0 auto;
+        padding: 14px 18px;
+        gap: 10px;
+    }
+
+    .nav-card-label {
+        font-size: 10px;
+    }
+
+    .nav-card-link {
+        font-size: 13px;
+        padding: 6px 0;
+    }
+
+    /* Mobile Scrolling Fix */
+    .card-nav.open {
+        max-height: 80vh;
+        /* Limit height to 80% of viewport */
+        overflow-y: auto;
+        /* Enable vertical scrolling */
+        -webkit-overflow-scrolling: touch;
+        /* Smooth scrolling on iOS */
+    }
+
+    /* Hide scrollbar for cleaner look but allow scrolling */
+    .card-nav.open::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .card-nav.open::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.02);
+    }
+
+    .card-nav.open::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 4px;
+    }
+}
+
+/* Animation for decrypt effect */
+@keyframes textGlitch {
+    0% {
+        opacity: 0.8;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0.8;
+    }
+}
+
+.nav-card-link {
+    font-family: 'Roboto Mono', monospace;
+}

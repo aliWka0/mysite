@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-site-verification" content="Z5IH1BRl-7iYbjaz1usj1NXhAFYE5eZO4kg40f_951o" />
+    <!-- SEO Meta Tags -->
+    <meta name="description"
+        content="Ali Valiyev - Creative Developer Portfolio. Exploring the intersection of design, code, and interactive art with WebGL and Anime.js.">
+    <meta name="keywords"
+        content="Ali Valiyev, Creative Developer, Portfolio, Web Design, WebGL, JavaScript, Anime.js, Frontend Developer">
+    <meta name="author" content="Ali Valiyev">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://alivaliyev.com/">
+    <meta property="og:title" content="Ali Valiyev - Creative Developer">
+    <meta property="og:description"
+        content="Interactive portfolio featuring WebGL experiments, modern UI/UX, and creative coding.">
+    <meta property="og:image" content="https://alivaliyev.com/assets/og-image.jpg">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://alivaliyev.com/">
+    <meta property="twitter:title" content="Ali Valiyev - Creative Developer">
+    <meta property="twitter:description"
+        content="Interactive portfolio featuring WebGL experiments, modern UI/UX, and creative coding.">
+    <meta property="twitter:image" content="https://alivaliyev.com/assets/og-image.jpg">
+
+    <title>Ali Valiyev - Creative Developer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Roboto+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="TargetCursor.css">
+    <link rel="stylesheet" href="BlurText.css">
+    <link rel="stylesheet" href="Lightning.css">
+    <link rel="stylesheet" href="LogoLoop.css">
+    <link rel="stylesheet" href="CardNav.css">
+    <link rel="stylesheet" href="DecryptedText.css">
+    <link rel="stylesheet" href="Magnet.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link rel="stylesheet" href="Loader.css">
+</head>
+
+<body>
+
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="loader-content">
+            <span id="loader-text">Yükleniyor</span>
+        </div>
+    </div>
+
+    <div class="animation-wrapper">
+        <canvas class="stagger-visualizer"></canvas>
+    </div>
+
+    <!-- Card Navigation -->
+    <div id="card-nav"></div>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <h1 class="hero-title" data-blur-text data-blur-delay="80" data-blur-direction="top">Oyun, Simülasyon ve
+                    Otomasyon Geliştirici</h1>
+                <p class="hero-text" data-blur-text data-blur-delay="60" data-blur-direction="bottom">Öylesine.</p>
+                <div class="hero-actions">
+                    <a href="projects.html" class="btn btn-primary cursor-target">Projeleri Gör</a>
+                    <a href="contact.html" class="btn btn-secondary cursor-target">CV / İletişim</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tech Stack Banner -->
+        <div class="tech-banner">
+            <div id="tech-loop"></div>
+        </div>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Ali Valiyev - Yazılım Geliştirici</p>
+    </footer>
+
+    <script src="script.js"></script>
+    <script src="Noise.js"></script>
+    <script src="Loader.js"></script>
+    <script src="Lightning.js"></script>
+    <script src="BlurText.js"></script>
+    <script src="LogoLoop.js"></script>
+    <script src="Magnet.js"></script>
+    <script src="CardNav.js"></script>
+    <script src="TargetCursor.js"></script>
+
+    <!-- Initialize Tech Stack Banner -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const techItems = [
+                { text: 'UNITY' },
+                { text: 'UNREAL ENGINE' },
+                { text: 'C#' },
+                { text: 'C++' },
+                { text: 'JAVASCRIPT' },
+                { text: 'THREE.JS' },
+                { text: 'ARDUINO' },
+                { text: 'PYTHON' },
+                { text: 'BLENDER' },
+                { text: 'GIT' },
+                { text: 'HTML/CSS' },
+                { text: 'FLASK' }
+            ];
+
+            const container = document.getElementById('tech-loop');
+            if (container) {
+                new LogoLoop(container, {
+                    items: techItems,
+                    speed: 60,
+                    direction: 'right',
+                    logoHeight: 20,
+                    gap: 70,
+                    hoverSpeed: 0,
+                    fadeOut: true,
+                    scaleOnHover: true,
+                    fadeOutColor: 'rgb(15, 15, 15)'
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

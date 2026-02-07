@@ -1,0 +1,183 @@
+.logoloop {
+    position: relative;
+    --logoloop-gap: 32px;
+    --logoloop-logoHeight: 28px;
+    --logoloop-fadeColorAuto: #000000;
+    overflow: hidden;
+    width: 100%;
+}
+
+.logoloop__track {
+    display: flex;
+    width: max-content;
+    will-change: transform;
+    user-select: none;
+}
+
+.logoloop__list {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.logoloop__item {
+    flex: 0 0 auto;
+    margin-right: var(--logoloop-gap);
+    font-size: var(--logoloop-logoHeight);
+    line-height: 1;
+    display: flex;
+    align-items: center;
+}
+
+.logoloop__node {
+    display: inline-flex;
+    align-items: center;
+    color: #555;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.logoloop__node:hover {
+    color: #fff;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+}
+
+.logoloop--scale-hover .logoloop__item:hover .logoloop__node {
+    transform: scale(1.15);
+}
+
+.logoloop__link {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+}
+
+/* Fade out edges */
+.logoloop--fade::before,
+.logoloop--fade::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: clamp(60px, 15%, 200px);
+    pointer-events: none;
+    z-index: 10;
+}
+
+.logoloop--fade::before {
+    left: 0;
+    background: linear-gradient(to right, var(--logoloop-fadeColor, var(--logoloop-fadeColorAuto)) 0%, transparent 100%);
+}
+
+.logoloop--fade::after {
+    right: 0;
+    background: linear-gradient(to left, var(--logoloop-fadeColor, var(--logoloop-fadeColorAuto)) 0%, transparent 100%);
+}
+
+/* CSS Keyframe Animations */
+@keyframes scrollLeft {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+@keyframes scrollRight {
+    0% {
+        transform: translateX(-50%);
+    }
+
+    100% {
+        transform: translateX(0);
+    }
+}
+
+/* ========================================
+   TECH STACK BANNER - Premium Style
+   ======================================== */
+.tech-banner {
+    position: relative;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(15, 15, 15, 0.9) 20%, rgba(15, 15, 15, 0.9) 80%, rgba(0, 0, 0, 0) 100%);
+    padding: 30px 0;
+    margin: 20px 0 60px 0;
+    overflow: hidden;
+}
+
+.tech-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 10%;
+    right: 10%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%);
+}
+
+.tech-banner::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 10%;
+    right: 10%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%);
+}
+
+.tech-banner .logoloop {
+    --logoloop-logoHeight: 16px;
+    --logoloop-gap: 70px;
+    --logoloop-fadeColor: rgb(15, 15, 15);
+}
+
+.tech-banner .logoloop__node {
+    font-family: 'Roboto Mono', monospace;
+    font-weight: 500;
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #444;
+    position: relative;
+    padding: 8px 0;
+}
+
+.tech-banner .logoloop__node::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 1px;
+    background: #fff;
+    transition: width 0.3s ease;
+}
+
+.tech-banner .logoloop__node:hover {
+    color: #fff;
+}
+
+.tech-banner .logoloop__node:hover::after {
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .tech-banner {
+        padding: 20px 0;
+        margin: 10px 0 40px 0;
+    }
+
+    .tech-banner .logoloop__node {
+        font-size: 11px;
+        letter-spacing: 2px;
+    }
+
+    .tech-banner .logoloop {
+        --logoloop-gap: 50px;
+    }
+}

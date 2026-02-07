@@ -1,0 +1,73 @@
+.blur-text-container {
+    display: inline;
+}
+
+.blur-text-word {
+    display: inline;
+    will-change: transform, filter, opacity;
+    transition-property: transform, filter, opacity;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    /* Remove any extra spacing */
+    margin: 0;
+    padding: 0;
+}
+
+.blur-text-word.from-top {
+    filter: blur(8px);
+    opacity: 0;
+    transform: translateY(-15px);
+}
+
+.blur-text-word.from-bottom {
+    filter: blur(8px);
+    opacity: 0;
+    transform: translateY(15px);
+}
+
+.blur-text-word.animate-in {
+    filter: blur(0px) !important;
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+}
+
+/* Hero title specific */
+.hero-title.blur-text-container {
+    display: block;
+    background: linear-gradient(to right, #fff, #888);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Section titles */
+.section-title.blur-text-container {
+    display: block;
+    text-align: center;
+}
+
+/* Keep headings as block */
+h2.blur-text-container,
+h3.blur-text-container {
+    display: block;
+}
+
+/* Paragraphs and list items - fix text-align justify issue */
+p.blur-text-container,
+li.blur-text-container {
+    display: block;
+    text-align: left !important;
+    text-justify: none !important;
+    word-spacing: normal !important;
+    letter-spacing: normal !important;
+}
+
+/* Fix for glass-card content */
+.glass-card p.blur-text-container,
+.about-text p.blur-text-container {
+    text-align: left !important;
+}
+
+/* Lead paragraph */
+.lead.blur-text-container {
+    display: block;
+}
