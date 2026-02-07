@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://alivaliyev.com/sitemap.xml
+Sitemap: https://ali.space/sitemap.xml
