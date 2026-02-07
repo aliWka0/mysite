@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hakkımda - Ali Valiyev</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Roboto+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="TargetCursor.css">
+    <link rel="stylesheet" href="BlurText.css">
+    <link rel="stylesheet" href="Lightning.css">
+    <link rel="stylesheet" href="LogoLoop.css">
+    <link rel="stylesheet" href="CardNav.css">
+    <link rel="stylesheet" href="DecryptedText.css">
+    <link rel="stylesheet" href="Magnet.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+</head>
+
+<body>
+
+    <div class="animation-wrapper">
+        <canvas class="stagger-visualizer"></canvas>
+    </div>
+
+    <!-- Card Navigation -->
+    <div id="card-nav"></div>
+
+    <main>
+        <!-- Page Header -->
+        <section class="page-header">
+            <h1 data-blur-text data-blur-delay="80" data-blur-direction="top">Hakkımda</h1>
+            <p data-blur-text data-blur-delay="50" data-blur-direction="bottom">Kim olduğum ve neler yaptığım</p>
+        </section>
+
+        <!-- About Section -->
+        <section class="section">
+            <div class="container glass-card">
+                <div class="about-grid">
+                    <div class="profile-img">
+                        <div class="avatar-placeholder"></div>
+                    </div>
+                    <div class="about-text">
+                        <h2 data-blur-text data-blur-delay="100" data-blur-direction="top">Ben Kimim?</h2>
+                        <p class="lead" data-blur-text data-blur-delay="50" data-blur-direction="bottom">Yazılım, oyun
+                            geliştirme, gömülü sistemler ve network alanlarında projeler üreten bir geliştiriciyim.</p>
+                        <p data-blur-text data-blur-delay="30" data-blur-direction="bottom">Unity ve Unreal Engine 5 ile
+                            mobil/PC oyunlar geliştiriyor, Arduino ve PLC sistemleriyle otomasyon ve robotik projeler
+                            tasarlıyorum.</p>
+                        <p data-blur-text data-blur-delay="30" data-blur-direction="bottom">Aynı zamanda Flask + Keras
+                            tabanlı yapay zeka entegrasyonlu web uygulamaları geliştirerek uçtan uca proje üretme
+                            deneyimine sahibim.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Skills Section -->
+        <section class="section">
+            <div class="container">
+                <h2 class="section-title" data-blur-text data-blur-delay="80" data-blur-direction="top">Kullandığım
+                    Teknolojiler</h2>
+                <div class="skills-grid">
+                    <div class="skill-card glass-card">
+                        <h3 data-blur-text data-blur-delay="80" data-blur-direction="top">Oyun Geliştirme</h3>
+                        <ul>
+                            <li data-blur-text data-blur-delay="40" data-blur-direction="bottom"><strong>Unity
+                                    (C#):</strong> 3D mobil oyunlar, fizik tabanlı mekanikler, korku oyunları
+                                (Backrooms)</li>
+                            <li data-blur-text data-blur-delay="40" data-blur-direction="bottom"><strong>Unreal Engine 5
+                                    (C++):</strong> Multiplayer FPS sistemleri, network mantığı, kod tabanlı proje
+                                mimarisi</li>
+                        </ul>
+                    </div>
+                    <div class="skill-card glass-card">
+                        <h3 data-blur-text data-blur-delay="80" data-blur-direction="top">Yazılım Geliştirme</h3>
+                        <ul>
+                            <li data-blur-text data-blur-delay="40" data-blur-direction="bottom"><strong>Flask +
+                                    Keras:</strong> Yapay zeka entegrasyonlu web uygulamaları, kripto fiyat tahmin
+                                sistemi</li>
+                            <li data-blur-text data-blur-delay="40" data-blur-direction="bottom"><strong>Visual
+                                    Studio:</strong> Form tabanlı masaüstü uygulamalar (login, rol sistemi, CRUD, arama)
+                            </li>
+                            <li data-blur-text data-blur-delay="40" data-blur-direction="bottom">
+                                <strong>HTML/CSS/JS:</strong> Web tabanlı oyun ve simülasyonlar, GitHub Pages ile
+                                yayınlama
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="skill-card glass-card">
+                        <h3 data-blur-text data-blur-delay="80" data-blur-direction="top">Gömülü Sistem & Otomasyon</h3>
+                        <ul>
+                            <li data-blur-text data-blur-delay="40" data-blur-direction="bottom">
+                                <strong>Arduino:</strong> 8 servo spider robot, mesafe sensörü entegrasyonu, pin
+                                planlama
+                            </li>
+                            <li data-blur-text data-blur-delay="40" data-blur-direction="bottom"><strong>Siemens S7-1200
+                                    (TIA Portal v17):</strong> PLC tabanlı otopark otomasyon sistemi</li>
+                        </ul>
+                    </div>
+                    <div class="skill-card glass-card">
+                        <h3 data-blur-text data-blur-delay="80" data-blur-direction="top">Network & Altyapı</h3>
+                        <ul>
+                            <li data-blur-text data-blur-delay="40" data-blur-direction="bottom"><strong>Cisco Packet
+                                    Tracer:</strong> OSPF routing, ACL, NAT, Telnet kısıtlama, CDP/LLDP</li>
+                            <li data-blur-text data-blur-delay="40" data-blur-direction="bottom"><strong>GitHub
+                                    Pages:</strong> Domain bağlama, SEO sorun tespiti</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Ali Valiyev - Yazılım Geliştirici</p>
+    </footer>
+
+    <script src="script.js"></script>
+    <script src="Lightning.js"></script>
+    <script src="BlurText.js"></script>
+    <script src="LogoLoop.js"></script>
+    <script src="Magnet.js"></script>
+    <script src="CardNav.js"></script>
+    <script src="TargetCursor.js"></script>
+
+</body>
+
+</html>

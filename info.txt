@@ -1,0 +1,263 @@
+1) Şimdiye Kadar Yaptığın Projeler (Tam Liste)
+1. Arduino ile 8 Servo Spider Robot
+
+8 servo motor ile örümcek robot kontrolü
+
+Servo pin planlaması:
+
+Sol–sağ hareket: 2, 4, 6, 9
+
+Yukarı–aşağı hareket: 3, 5, 7, 10
+
+Mesafe sensörü entegrasyonu:
+
+Echo: 13
+
+Trig: 12
+
+Robotun çevreyi algılayıp hareket etmesi üzerine çalışma
+
+2. TIA Portal v17 + Siemens S7-1200 ile Otopark Sistemi
+
+PLC tabanlı otopark otomasyonu
+
+Kullanılan cihaz: Siemens S7-1200 CPU 1214 DC/DC/DC
+
+Giriş-çıkış mantığı, doluluk kontrolü, temel otomasyon akışları
+
+3. Flask + Keras ile Kripto Fiyat Tahmin Web Uygulaması
+
+Web arayüz: Flask
+
+Model: önceden eğitilmiş Keras modeli
+
+Tahmin sonuçlarını web üzerinden kullanıcıya sunma
+
+Veri alma → modele gönderme → çıktı üretme akışı
+
+4. Visual Studio ile Form Tabanlı Masaüstü Uygulaması
+
+Proje içinde şu modüller var:
+
+Kullanıcı girişi (Login)
+
+Ürün kayıt / ürün düzenleme
+
+Listeleme ve arama
+
+İstatistik ekranı
+
+Değerlendirme ekranı
+
+Kullanıcı rolleri:
+
+Admin
+
+Normal kullanıcı
+
+Görsel tasarımın önemli olduğu bir yapı
+
+5. Cisco Packet Tracer – Üniversite Seviyesi Network Topolojisi
+
+İçerik:
+
+OSPF dinamik routing
+
+ACL yapılandırması
+
+Telnet erişim kısıtlama
+
+NAT kurulumu
+
+CDP / LLDP yapılandırması
+
+Üniversite ödevi seviyesinde gerçekçi network senaryosu
+
+6. Unity ile 3D Mobil Oyun (3D Mobile Core)
+
+Unity’de mobil proje kurma
+
+FPS temelli oyun fikri: “KurtKim”
+
+Mobil performans hedefli çalışma
+
+7. Unreal Engine 5 – Multiplayer FPS Oyun Sistemi
+
+UE5’te online multiplayer sistem kurma hedefi
+
+Multiplayer sample yapı ve network mantığı üzerine çalışma
+
+8. Unreal Engine ile Sadece C++ Kullanarak FPS Oyun
+
+“Editor üzerinden elle kurmadan”
+
+Tamamen C++ ile FPS oyun altyapısı kurma hedefi
+
+Kod tabanlı proje mimarisi
+
+9. Backrooms – Mobil Korku Oyunu
+
+Mobilde çalışan Backrooms oyunu geliştirme
+
+Level 0 harita tasarımı
+
+Referans ölçüler:
+
+Duvar/tavan/ışık düzeni
+
+Oyuncunun algısını bozan mikro “hile” sistemleri üzerine çalışma
+
+10. Masa Eğme Mekanikli Mobil Oyun
+
+Oyuncu masayı oynatarak topu deliğe sokuyor
+
+Fizik tabanlı mini oyun
+
+Oynanış testleri + geliştirme fikri arayışı
+
+11. Jumpie Oyunu (Video Analiz ile İyileştirme)
+
+Oyunun videosunu hazırlayıp analiz ettirme
+
+Eksikleri tespit edip geliştirme planı çıkartma
+
+12. AI ile Kısa Hikaye → Animasyon → Seslendirme Projesi
+
+Yapay zeka araçlarıyla:
+
+Hikaye yazımı
+
+Animasyona çevirme
+
+Seslendirme ekleme
+
+“Başlangıçtan teslim ürüne” kadar içerik üretim süreci
+
+13. Müzik Sesine Göre Tepki Veren Görselleştirme Sistemi
+
+Remix videolarındaki gibi:
+
+Ses → görsel tepki
+
+Audio reactive mantığı
+
+14. HTML Tabanlı Oyun / Simülasyon Projeleri
+
+HTML ile oyun geliştirme
+
+Simülasyon fikri üretme
+
+HTML oyunu APK’ya dönüştürme konusu üzerine çalışma
+
+15. Portfolyo Web Sitesi Planlama
+
+Tasarım + içerik + sayfa planı
+
+Kodlamayı kendin yapacağın şekilde yapılandırma
+
+16. alıv.space Web Sitesi (GitHub Hosting)
+
+Domain: aliv.space
+
+Hosting: GitHub Pages
+
+“www yok” konusu
+
+Google’da index problemi (SEO / Search Console ihtiyacı)
+
+17. Elektronik Keman (E-Violin) Ayar Kontrol Uygulamaları
+
+Elektronik keman ayarlarını kontrol eden yazılım/uygulamalar araştırması
+
+18. 3D Karakter Talebi (UE için FBX)
+
+Klasik kurtadam karakteri
+
+Animasyon seti:
+
+Idle, Attack, Run, Walk
+
+Unreal’a uygun FBX export hedefi
+
+2) Bu Projelerden Çıkan Yeteneklerin (Net ve Web Sitesine Uygun)
+Yazılım Geliştirme
+
+Web uygulama geliştirme (Flask)
+
+Masaüstü uygulama geliştirme (Visual Studio – form tabanlı)
+
+Proje modül tasarımı (login, rol sistemi, CRUD, arama, istatistik)
+
+Yapay Zeka / ML Entegrasyonu
+
+Eğitilmiş Keras modelini web sistemine entegre etme
+
+Model → API → kullanıcı arayüzü akışı kurma
+
+Oyun Geliştirme (Çok Güçlü Alan)
+
+Unity ile 3D mobil oyun geliştirme
+
+Unreal Engine 5 ile FPS geliştirme
+
+Multiplayer mantığı ve network temelleri
+
+Mobil performans odaklı oyun tasarımı
+
+Korku oyunu (Backrooms) seviye tasarımı ve atmosfer kurma
+
+Network / Siber Altyapı
+
+OSPF routing
+
+ACL
+
+NAT
+
+Telnet erişim kısıtlaması
+
+CDP/LLDP
+
+Packet Tracer ile topoloji kurma
+
+Otomasyon / Endüstriyel Sistemler
+
+PLC mantığı
+
+Siemens S7-1200
+
+TIA Portal v17
+
+Otopark otomasyon senaryosu kurma
+
+Gömülü Sistem / Robotik
+
+Arduino ile servo motor kontrolü
+
+Mesafe sensörü entegrasyonu
+
+Robot hareket planlama
+
+Pin planlama ve donanım bağlantı mantığı
+
+İçerik Üretimi + AI Kullanımı
+
+AI ile hikaye üretimi
+
+Animasyonlaştırma
+
+Seslendirme pipeline’ı
+
+Reels / kısa video prompt yazımı
+
+Web & Yayınlama
+
+GitHub Pages ile site yayınlama
+
+Domain bağlama
+
+Index/SEO sorunlarını teşhis edebilme
+
+3) Web Sitesi İçin Hazır “Kısa Biyografi” (Kopyala-Yapıştır)
+
+Yazılım, oyun geliştirme, gömülü sistemler ve network alanlarında projeler üreten bir geliştiriciyim. Unity ve Unreal Engine 5 ile mobil/PC oyunlar geliştiriyor, Arduino ve PLC sistemleriyle otomasyon ve robotik projeler tasarlıyorum. Aynı zamanda Flask + Keras tabanlı yapay zeka entegrasyonlu web uygulamaları geliştirerek uçtan uca proje üretme deneyimine sahibim.

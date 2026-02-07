@@ -1,0 +1,39 @@
+.decrypted-text {
+    display: inline-block;
+    font-family: inherit;
+}
+
+.decrypted-text span {
+    display: inline;
+    transition: color 0.1s ease;
+}
+
+.encrypted-char {
+    color: #555;
+}
+
+.revealed-char {
+    color: #fff;
+}
+
+/* CardNav specific decrypt styling */
+.nav-card-link.decrypted-text {
+    display: inline-flex;
+}
+
+.nav-card-link .encrypted-char {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.nav-card-link .revealed-char {
+    color: #fff;
+}
+
+/* Logo decrypt effect */
+.card-nav-logo.decrypted-text .encrypted-char {
+    color: #444;
+}
+
+.card-nav-logo.decrypted-text .revealed-char {
+    color: #fff;
+}
