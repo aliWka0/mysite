@@ -1,17 +1,10 @@
 :root {
     --bg-color: #000000;
     --text-color: #ffffff;
-<<<<<<< HEAD
-    --accent-color: #FF4B4B;
-    --accent-secondary: #2B2D42;
-    --cyan: #00ffff;
-    --green: #4caf50;
-=======
     --accent-color: #888888;
     --accent-secondary: #333333;
     --gray-light: #aaaaaa;
     --gray-dark: #444444;
->>>>>>> f57ded6 (update)
     --font-main: 'Inter', sans-serif;
     --font-mono: 'Roboto Mono', monospace;
 }
@@ -30,58 +23,16 @@ body {
     line-height: 1.6;
 }
 
-<<<<<<< HEAD
-/* Header */
-=======
 /* Header - Premium Design */
->>>>>>> f57ded6 (update)
 .site-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-<<<<<<< HEAD
-    padding: 20px 40px;
-=======
     padding: 20px 50px;
->>>>>>> f57ded6 (update)
     position: fixed;
     top: 0;
     width: 100%;
     z-index: 100;
-<<<<<<< HEAD
-    background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(5px);
-}
-
-.logo {
-    font-weight: 800;
-    font-size: 1.5rem;
-    letter-spacing: -1px;
-    color: var(--text-color);
-}
-
-.logo .dot {
-    color: var(--accent-color);
-}
-
-nav a {
-    color: #888;
-    text-decoration: none;
-    margin-left: 30px;
-    font-size: 0.9rem;
-    transition: color 0.3s;
-}
-
-nav a:hover {
-    color: var(--text-color);
-}
-
-.btn-download {
-    background: rgba(255, 255, 255, 0.1);
-    padding: 8px 16px;
-    border-radius: 4px;
-    color: white !important;
-=======
     background: rgba(10, 10, 10, 0.7);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
@@ -234,51 +185,30 @@ nav a:hover::after {
     border-color: rgba(255, 255, 255, 0.3);
     box-shadow: 0 0 30px rgba(255, 255, 255, 0.15);
     transform: translateY(-2px);
->>>>>>> f57ded6 (update)
 }
 
 /* Hero Section */
 .hero {
-<<<<<<< HEAD
-    /* height: 100vh;  Removed constraints to allow content to flow over fixed bg */
-=======
->>>>>>> f57ded6 (update)
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
     position: relative;
-<<<<<<< HEAD
-    padding-top: 15vh;
-    /* Push content down slightly */
-=======
     padding-top: 120px;
     padding-bottom: 60px;
->>>>>>> f57ded6 (update)
     min-height: 100vh;
 }
 
 .animation-wrapper {
     position: fixed;
-<<<<<<< HEAD
-    /* Global fixed background */
-=======
->>>>>>> f57ded6 (update)
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
     z-index: -1;
-<<<<<<< HEAD
-    /* Behind everything */
     overflow: hidden;
     background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
-    /* Deep space gradient */
-=======
-    overflow: hidden;
-    background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
->>>>>>> f57ded6 (update)
 }
 
 /* Stagger Visualizer (Canvas) */
@@ -290,52 +220,6 @@ nav a:hover::after {
 
 .hero-content {
     z-index: 10;
-<<<<<<< HEAD
-    max-width: 900px;
-    padding: 20px;
-}
-
-.hero-title {
-    font-size: 3.5rem;
-    /* Adjusted for longer text */
-    font-weight: 800;
-    margin-bottom: 20px;
-    letter-spacing: -0.05em;
-    background: linear-gradient(to right, #fff, #888);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    line-height: 1.2;
-}
-
-.hero-text {
-    font-size: 1.2rem;
-    color: #aaa;
-    margin-bottom: 40px;
-    font-weight: 300;
-}
-
-.btn {
-    display: inline-block;
-    padding: 12px 30px;
-    border-radius: 30px;
-    border: none;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    text-decoration: none;
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.btn-primary {
-    background-color: var(--accent-color);
-    color: white;
-    margin-right: 15px;
-}
-
-.btn-primary:hover {
-    box-shadow: 0 0 20px rgba(255, 75, 75, 0.5);
-    transform: translateY(-2px);
-=======
     max-width: 800px;
     padding: 40px 30px;
     display: flex;
@@ -397,19 +281,10 @@ nav a:hover::after {
 .btn-primary:hover {
     box-shadow: 0 6px 30px rgba(255, 255, 255, 0.35);
     transform: translateY(-3px);
->>>>>>> f57ded6 (update)
 }
 
 .btn-secondary {
     background: transparent;
-<<<<<<< HEAD
-    color: white;
-    border: 1px solid #333;
-}
-
-.btn-secondary:hover {
-    border-color: #666;
-=======
     color: #fff;
     border: 1px solid rgba(255, 255, 255, 0.25);
 }
@@ -418,7 +293,6 @@ nav a:hover::after {
     border-color: rgba(255, 255, 255, 0.5);
     background: rgba(255, 255, 255, 0.05);
     transform: translateY(-2px);
->>>>>>> f57ded6 (update)
 }
 
 /* Footer */
@@ -442,14 +316,6 @@ footer {
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
     border-radius: 16px;
     padding: 40px;
-<<<<<<< HEAD
-    transition: transform 0.3s ease, border-color 0.3s ease;
-}
-
-.glass-card:hover {
-    border-color: var(--accent-color);
-    transform: translateY(-5px);
-=======
     transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
     text-align: left;
     word-spacing: normal;
@@ -459,7 +325,6 @@ footer {
     border-color: rgba(255, 255, 255, 0.2);
     transform: translateY(-5px);
     box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
->>>>>>> f57ded6 (update)
 }
 
 /* Base Layout */
@@ -469,10 +334,6 @@ footer {
     display: flex;
     justify-content: center;
     align-items: center;
-<<<<<<< HEAD
-    /* Ensure it sits above fixed bg */
-=======
->>>>>>> f57ded6 (update)
     position: relative;
     z-index: 1;
 }
@@ -492,32 +353,6 @@ footer {
 /* About Section */
 .about-grid {
     display: grid;
-<<<<<<< HEAD
-    grid-template-columns: 1fr 2fr;
-    gap: 40px;
-    align-items: center;
-}
-
-.avatar-placeholder {
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
-    background: #333;
-    margin: 0 auto;
-    border: 2px solid var(--accent-color);
-}
-
-.about-text h2 {
-    margin-bottom: 20px;
-    color: var(--accent-color);
-}
-
-.lead {
-    font-size: 1.2rem;
-    font-weight: 600;
-    margin-bottom: 20px;
-    color: white;
-=======
     grid-template-columns: auto 1fr;
     gap: 50px;
     align-items: start;
@@ -565,7 +400,6 @@ footer {
 
 .about-text p:last-child {
     margin-bottom: 0;
->>>>>>> f57ded6 (update)
 }
 
 /* Skills Section */
@@ -576,11 +410,7 @@ footer {
 }
 
 .skill-card h3 {
-<<<<<<< HEAD
-    color: var(--accent-color);
-=======
     color: #fff;
->>>>>>> f57ded6 (update)
     margin-bottom: 20px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     padding-bottom: 10px;
@@ -592,14 +422,9 @@ footer {
 
 .skill-card li {
     margin-bottom: 15px;
-<<<<<<< HEAD
-    color: #ccc;
-    font-size: 0.95rem;
-=======
     color: #bbb;
     font-size: 0.95rem;
     line-height: 1.6;
->>>>>>> f57ded6 (update)
 }
 
 .skill-card strong {
@@ -609,13 +434,8 @@ footer {
 /* Projects Section */
 .projects-grid {
     display: grid;
-<<<<<<< HEAD
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 40px;
-=======
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     gap: 30px;
->>>>>>> f57ded6 (update)
 }
 
 .project-card {
@@ -628,15 +448,9 @@ footer {
 }
 
 .project-img-placeholder {
-<<<<<<< HEAD
-    height: 200px;
-    width: 100%;
-    transition: transform 0.5s;
-=======
     height: 180px;
     width: 100%;
     transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
->>>>>>> f57ded6 (update)
 }
 
 .project-card:hover .project-img-placeholder {
@@ -644,28 +458,16 @@ footer {
 }
 
 .project-info {
-<<<<<<< HEAD
-    padding: 30px;
-=======
     padding: 24px;
->>>>>>> f57ded6 (update)
 }
 
 .project-info h3 {
     margin-bottom: 10px;
-<<<<<<< HEAD
-    font-size: 1.4rem;
-=======
     font-size: 1.3rem;
->>>>>>> f57ded6 (update)
 }
 
 .project-info p {
     font-size: 0.9rem;
-<<<<<<< HEAD
-    color: #999;
-    margin-bottom: 20px;
-=======
     color: #888;
     margin-bottom: 16px;
     line-height: 1.5;
@@ -675,19 +477,10 @@ footer {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
->>>>>>> f57ded6 (update)
 }
 
 .tags span {
     display: inline-block;
-<<<<<<< HEAD
-    background: rgba(255, 255, 255, 0.1);
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    margin-right: 5px;
-    color: #ccc;
-=======
     background: rgba(255, 255, 255, 0.08);
     padding: 5px 12px;
     border-radius: 20px;
@@ -700,7 +493,6 @@ footer {
 .tags span:hover {
     background: rgba(255, 255, 255, 0.15);
     color: #fff;
->>>>>>> f57ded6 (update)
 }
 
 /* Contact Section */
@@ -710,15 +502,6 @@ footer {
     margin: 0 auto;
 }
 
-<<<<<<< HEAD
-.contact-links {
-    margin-top: 40px;
-    display: flex;
-    gap: 20px;
-    justify-content: center;
-}
-
-=======
 .contact-container h2 {
     color: #fff;
 }
@@ -732,7 +515,6 @@ footer {
 }
 
 /* Mobile Responsive */
->>>>>>> f57ded6 (update)
 @media (max-width: 768px) {
     .about-grid {
         grid-template-columns: 1fr;
@@ -741,14 +523,6 @@ footer {
 
     .contact-links {
         flex-direction: column;
-<<<<<<< HEAD
-    }
-
-    .hero-title {
-        font-size: 2.5rem;
-    }
-}
-=======
         align-items: center;
     }
 
@@ -921,4 +695,3 @@ nav a.active::before {
         font-size: 2rem;
     }
 }
->>>>>>> f57ded6 (update)
