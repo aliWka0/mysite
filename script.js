@@ -36,7 +36,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Bigger and brighter
             this.size = Math.random() * 3 + 1.5;
+<<<<<<< HEAD
+            this.color = Math.random() > 0.6 ? '#00ffff' : '#FF4B4B'; // More cyan
+=======
             this.color = Math.random() > 0.5 ? '#ffffff' : '#888888'; // White and gray theme
+>>>>>>> f57ded6 (update)
 
             this.isShooter = Math.random() > 0.95; // More shooters
             this.velZ = this.isShooter ? Math.random() * 20 + 10 : 0; // Faster shooters
