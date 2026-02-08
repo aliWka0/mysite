@@ -635,7 +635,7 @@ nav a.active::before {
 
 .social-links {
     display: flex;
-    gap: 12px;
+    gap: 30px;
 }
 
 .contact-form {
