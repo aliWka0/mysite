@@ -635,7 +635,17 @@ nav a.active::before {
 
 .social-links {
     display: flex;
-    gap: 30px;
+    gap: 40px;
+    /* Increased further */
+}
+
+.social-links a {
+    margin-right: 20px;
+    /* Fallback for gap */
+}
+
+.social-links a:last-child {
+    margin-right: 0;
 }
 
 .contact-form {
