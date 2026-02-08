@@ -228,16 +228,16 @@
 
         new CardNav(container, {
             logo: 'ALI VALIYEV',
-            logoHref: 'index.html',
+            logoHref: '/',
             ctaText: 'İLETİŞİM',
-            ctaHref: 'contact.html',
+            ctaHref: '/contact',
             items: [
                 {
                     label: 'ANA SAYFA',
                     bgColor: 'rgba(30, 30, 30, 0.95)',
                     textColor: '#fff',
                     links: [
-                        { label: 'ANASAYFA', href: 'index.html' }
+                        { label: 'ANASAYFA', href: '/' }
                     ]
                 },
                 {
@@ -245,8 +245,8 @@
                     bgColor: 'rgba(35, 35, 35, 0.95)',
                     textColor: '#fff',
                     links: [
-                        { label: 'PROFİL', href: 'about.html' },
-                        { label: 'YETENEKLER', href: 'about.html#skills' }
+                        { label: 'PROFİL', href: '/about' },
+                        { label: 'YETENEKLER', href: '/about#skills' }
                     ]
                 },
                 {
@@ -254,8 +254,8 @@
                     bgColor: 'rgba(40, 40, 40, 0.95)',
                     textColor: '#fff',
                     links: [
-                        { label: 'TÜM PROJELER', href: 'projects.html' },
-                        { label: 'DETAYLI GÖRÜNÜM', href: 'project-detail.html' }
+                        { label: 'TÜM PROJELER', href: '/projects' },
+                        { label: 'DETAYLI GÖRÜNÜM', href: '/project-detail' }
                     ]
                 }
             ]
