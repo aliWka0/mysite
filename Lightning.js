@@ -6,8 +6,8 @@
     const config = {
         hue: 0,           // 0 = white/gray lightning (monochrome theme)
         xOffset: 0,
-        speed: 0.7,
-        intensity: 0.6,
+        speed: 0.4,       // Daha yumuşak hareket için yavaşlatıldı (eski değer: 0.7)
+        intensity: 0.6,   // Işık gücü tekrar artırıldı
         size: 2
     };
 
@@ -55,6 +55,8 @@
             uniform float uIntensity;
             uniform float uSize;
             uniform float uDistortion;
+            uniform vec2 uMouse;
+            uniform float uWarp;
             
             #define OCTAVE_COUNT 10
 
@@ -112,21 +114,46 @@
                 uv.x *= iResolution.x / iResolution.y;
                 uv.x += uXOffset;
                 
-                // Use uDistortion uniform to control the amplitude of the noise displacement
-                uv += uDistortion * fbm(uv * uSize + 0.8 * iTime * uSpeed) - (uDistortion * 0.5);
+                // MOUSE INTERACTION (Fare Etkileşimi)
+                // Şekli kırıp bozmak yerine fareye yakın yerlerde enerji dalgalanmasını/bozulmasını artırır
+                float mouseXAspect = uMouse.x * (iResolution.x / iResolution.y);
+                float mouseDist = distance(vec2(uv.x, uv.y), vec2(mouseXAspect, uMouse.y));
+                float mouseAura = exp(-2.5 * mouseDist); // Fareye olan yakınlık (yumuşak düşüş)
+                
+                // Şekli bozmayacak kadar çok çok hafif, organik bir çekim
+                uv.x += (uv.x - mouseXAspect) * mouseAura * -0.05;
+                
+                // NOISE & WARP DISTORTION (Aşırı Yüklenme Distorsiyonu)
+                // Fare yakınlığında (mouseAura) noise distorsiyonunu (çırpınmayı) artır
+                float warpDistort = uDistortion + (uWarp * 0.01) + (mouseAura * 0.5);
+                vec2 fbmUV = uv * uSize + 0.8 * iTime * uSpeed;
+                uv += warpDistort * fbm(fbmUV) - (warpDistort * 0.5);
                 
                 float dist = abs(uv.x);
+                
+                // BRANCHING (Çatallanma ve Kökler)
+                float dist2 = abs(uv.x + 0.4 * fbm(fbmUV * 2.0 + 10.0) - 0.2);
+                float dist3 = abs(uv.x - 0.5 * fbm(fbmUV * 1.5 - 5.0) + 0.25);
                 
                 // Monochrome version for black/white theme
                 vec3 baseColor;
                 if (uHue < 1.0) {
-                    // Pure white/gray for hue = 0
                     baseColor = vec3(0.9, 0.9, 0.95);
                 } else {
                     baseColor = hsv2rgb(vec3(uHue / 360.0, 0.7, 0.8));
                 }
                 
-                vec3 col = baseColor * pow(mix(0.0, 0.07, hash11(iTime * uSpeed)) / dist, 1.0) * uIntensity;
+                // OVERLOAD INTENSITY (Scroll Aşırı Yüklenmesi)
+                // Kaydırma anındaki patlamayı daha naif ve akıcı yaptık (çarpanları kıstık)
+                float currentIntensity = uIntensity * (1.0 + uWarp * 0.005 + mouseAura * 0.2); // Farenin altında hafif aydınlanma
+                
+                // Titremeyi önleyen sabit ışık kalınlığı ve dalların birleştirilmesi
+                float lightThickness = 0.05 + (uWarp * 0.0002); // Warp anında sadece çok hafif kalınlaşır
+                float core = lightThickness / dist;
+                float branch1 = (lightThickness * 0.3) / dist2; 
+                float branch2 = (lightThickness * 0.2) / dist3;
+                
+                vec3 col = baseColor * (core + branch1 + branch2) * currentIntensity;
                 col = pow(col, vec3(1.0));
                 fragColor = vec4(col, 1.0);
             }
@@ -181,9 +208,40 @@
         const uIntensityLocation = gl.getUniformLocation(program, 'uIntensity');
         const uSizeLocation = gl.getUniformLocation(program, 'uSize');
         const uDistortionLocation = gl.getUniformLocation(program, 'uDistortion');
+        const uMouseLocation = gl.getUniformLocation(program, 'uMouse');
+        const uWarpLocation = gl.getUniformLocation(program, 'uWarp');
 
         const startTime = performance.now();
         let animationId;
+
+        // Mouse tracking for magnetic effect
+        let targetMouseX = 0;
+        let targetMouseY = 0;
+        let currentMouseX = 0;
+        let currentMouseY = 0;
+
+        window.addEventListener('mousemove', (e) => {
+            targetMouseX = (e.clientX / window.innerWidth) * 2 - 1;
+            targetMouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+        });
+
+        // Mobile touch support
+        window.addEventListener('touchmove', (e) => {
+            if (e.touches.length > 0) {
+                targetMouseX = (e.touches[0].clientX / window.innerWidth) * 2 - 1;
+                targetMouseY = -(e.touches[0].clientY / window.innerHeight) * 2 + 1;
+            }
+        });
+
+        window.addEventListener('touchstart', (e) => {
+            if (e.touches.length > 0) {
+                targetMouseX = (e.touches[0].clientX / window.innerWidth) * 2 - 1;
+                targetMouseY = -(e.touches[0].clientY / window.innerHeight) * 2 + 1;
+                // Anında tepki vermesi için (yumuşatma olmadan) ilk dokunuşta direkt zıpla
+                currentMouseX = targetMouseX;
+                currentMouseY = targetMouseY;
+            }
+        });
 
         const render = () => {
             resizeCanvas();
@@ -223,6 +281,15 @@
             const isMobile = canvas.width < 768;
             const distortion = isMobile ? 1.0 : 2.0;
             gl.uniform1f(uDistortionLocation, distortion);
+
+            // Smooth mouse easing
+            currentMouseX += (targetMouseX - currentMouseX) * 0.1;
+            currentMouseY += (targetMouseY - currentMouseY) * 0.1;
+            
+            gl.uniform2f(uMouseLocation, currentMouseX, currentMouseY);
+            
+            // Warp overload from scroll (defined in script.js)
+            gl.uniform1f(uWarpLocation, window.warpSpeedOffset || 0);
 
             gl.drawArrays(gl.TRIANGLES, 0, 6);
             animationId = requestAnimationFrame(renderFixed);

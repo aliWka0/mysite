@@ -118,7 +118,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                     hideStyle.innerHTML = '.lightning-container { opacity: 1; transition: opacity 2s ease; }';
                                 }
 
-                                // Animate Intensity from 0 to 0.6 (default)
+                                // Animate Intensity from 0 to 0.6
                                 if (window.setLightningIntensity) {
                                     let intensity = 0;
                                     const targetIntensity = 0.6;

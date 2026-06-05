@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const ctx = canvas.getContext('2d');
 
     // 3D Configuration
-    const particleCount = 800; // Increased density
+    const particleCount = 350; // Optimized for Constellation Lines
     const focalLength = 400;
     const depth = 2000;
 
@@ -13,6 +13,22 @@ document.addEventListener('DOMContentLoaded', () => {
     let mouse = { x: 0, y: 0 };
     let targetMouse = { x: 0, y: 0 }; // For smooth easing
     let width, height;
+    let clickPulse = 0; // Tıklama ile oluşan şok dalgası enerjisi
+    window.warpSpeedOffset = 0; // Cinematic scroll speed multiplier
+
+    // Tıklama Şok Dalgası (Shockwave) Events
+    // Basılı tutmayı iptal edip sadece tıklandığı an enerji patlaması yaratıyoruz
+    window.addEventListener('mousedown', () => clickPulse = 2.0);
+    window.addEventListener('touchstart', (e) => {
+        // Mobilde ilk dokunuşta karadelik rastgele bir yerde (eski mouse konumunda) oluşmasın diye hedefe anında atlar
+        if (e.touches && e.touches.length > 0) {
+            targetMouse.x = e.touches[0].clientX;
+            targetMouse.y = e.touches[0].clientY;
+            mouse.x = targetMouse.x;
+            mouse.y = targetMouse.y;
+        }
+        clickPulse = 2.0;
+    });
 
     function resize() {
         // Set canvas to full screen/window size to ensure global coverage
@@ -34,8 +50,8 @@ document.addEventListener('DOMContentLoaded', () => {
             this.y = (Math.random() - 0.5) * height * 8;
             this.z = Math.random() * depth;
 
-            // Bigger and brighter
-            this.size = Math.random() * 3 + 1.5;
+            // Daha belirgin ve büyük noktalar
+            this.size = Math.random() * 4 + 2;
             this.color = Math.random() > 0.5 ? '#ffffff' : '#888888'; // White and gray theme
 
             this.isShooter = Math.random() > 0.95; // More shooters
@@ -43,16 +59,42 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         update() {
-            // Constant forward movement for everyone (Infinite Flythrough)
-            // Shooters retain their high speed, regular stars get a slow drift
-            // This ensures background is never static even if mouse stops
-            const speed = this.isShooter ? this.velZ : 2;
+            // Interactive Physics (Repel & Vortex)
+            // Kamera hareketi nedeniyle parçacığın sahte konumu hesaplanıyor
+            const cameraX = (mouse.x - width / 2) * 5.0;
+            const cameraY = (mouse.y - height / 2) * 5.0;
+            
+            // Farenin uzaydaki göreceli pozisyonu (basit izdüşüm)
+            const dx = this.x - cameraX;
+            const dy = this.y - cameraY;
+            const dist = Math.sqrt(dx*dx + dy*dy);
+
+            // VORTEX PULSE (Tıklama ile Karadelik)
+            // Basılı tutma kaosunu engeller ancak ard arda tıklamalarda sevdiğiniz içeri çekme/spiral (vortex) etkisini geri getirir
+            if (clickPulse > 0.01 && dist < 2500) { 
+                const force = (2500 - dist) / 2500;
+                // Sistem hızı (çekim gücü) çok düşürüldü. Relaxing (Slow-motion) akış sağlandı.
+                this.x -= (dx * 0.02 * force * clickPulse) + (dy * 0.03 * force * clickPulse); 
+                this.y -= (dy * 0.02 * force * clickPulse) - (dx * 0.03 * force * clickPulse);
+                this.z -= force * 3 * clickPulse; // Eskiden 20'ydi, çok yumuşatıldı
+            } else {
+                // MAGNETIC REPULSION (Gezinirken Fare Kalkanı)
+                if (dist < 400) {
+                    const force = (400 - dist) / 400;
+                    this.x += dx * 0.15 * force; 
+                    this.y += dy * 0.15 * force;
+                }
+            }
+
+            // Normal İleri Hareket (Warp dahil)
+            const baseSpeed = this.isShooter ? this.velZ : 2;
+            const speed = baseSpeed + window.warpSpeedOffset;
             this.z -= speed;
 
-            // Reset when they pass the camera
-            if (this.z <= 0) {
+            // Kamera arkasına geçtiğinde veya çok uzağa itildiğinde resetle
+            if (this.z <= 0 || this.x > width * 10 || this.x < -width * 10 || this.y > height * 10 || this.y < -height * 10) {
                 this.reset();
-                this.z = depth; // Respawn at far end for continuous stream
+                this.z = depth; // En arkadan yeniden doğ
             }
         }
 
@@ -84,22 +126,34 @@ document.addEventListener('DOMContentLoaded', () => {
             const x2d = x3d * scale + width / 2;
             const y2d = y3d * scale + height / 2;
 
-            // Draw
-            // Opacity based on depth (fog)
-            const alpha = Math.min(1, scale * 2);
-            ctx.globalAlpha = alpha;
-            ctx.fillStyle = this.color;
+            // Cache 2D coordinates for constellation lines later
+            this.x2d = x2d;
+            this.y2d = y2d;
+            
+            // Atmospheric Depth Fog (Derinlik Sisi ve Renk)
+            this.depthRatio = Math.max(0, 1 - (z3d / depth)); // 1 = yakın, 0 = uzak
+            const cVal = Math.floor(150 + 105 * this.depthRatio); // Karanlıkta bile tamamen siyah olmasın
+            const dynamicColor = `rgb(${cVal}, ${cVal}, ${cVal})`; // Tamamen gri/beyaz (tema rengi)
+            
+            ctx.globalAlpha = Math.max(0.3, this.depthRatio); // Görünmez olmasınlar, en az %30 görünür kalsınlar
+            ctx.fillStyle = dynamicColor;
 
             // Different drawing for shooters vs stars
             if (this.isShooter) {
-                // Trail effect
-                const trailScale = focalLength / (focalLength + z3d + 150);
-                const tx = this.x * trailScale + width / 2; // Approximate trail origin
+                // Realistic Comet Trails (Linear Gradient)
+                // Kuyruğun uzaydaki konumu (hızına bağlı olarak geride kalır)
+                const trailScale = focalLength / (focalLength + z3d + (this.velZ * 8));
+                const tx = (this.x - shiftX) * trailScale + width / 2;
+                const ty = (this.y - shiftY) * trailScale + height / 2;
+                
+                const grad = ctx.createLinearGradient(x2d, y2d, tx, ty);
+                grad.addColorStop(0, `rgba(255, 255, 255, ${this.depthRatio})`); // Başı parlak
+                grad.addColorStop(1, 'rgba(255, 255, 255, 0)'); // Kuyruk eriyerek yok olur
+                
                 ctx.beginPath();
                 ctx.moveTo(x2d, y2d);
-                // Longer dashes
-                ctx.lineTo(x2d + (x2d - width / 2) * 0.2, y2d + (y2d - height / 2) * 0.2);
-                ctx.strokeStyle = this.color;
+                ctx.lineTo(tx, ty);
+                ctx.strokeStyle = grad;
                 ctx.lineWidth = 3 * scale;
                 ctx.stroke();
             } else {
@@ -121,17 +175,50 @@ document.addEventListener('DOMContentLoaded', () => {
     function animate() {
         ctx.clearRect(0, 0, width, height);
 
+        // Her karede şok dalgasının enerjisi yavaşça sönümlenir (Slow-motion etki için 0.9'dan 0.96'ya çıkarıldı)
+        clickPulse *= 0.96;
+
         // Smooth Mouse Easing (Camera inertia)
         mouse.x += (targetMouse.x - mouse.x) * 0.05;
         mouse.y += (targetMouse.y - mouse.y) * 0.05;
 
-        // Render particles sorted by depth (painter's algorithm - optional for dots but good for trails)
-        // particles.sort((a, b) => b.z - a.z); // Optimization: skip sort if just additive blending dots
-
+        // Render particles sorted by depth
+        particles.sort((a, b) => b.z - a.z);
         particles.forEach(p => {
             p.update();
             p.draw(ctx);
         });
+
+        // Draw Constellation / Network Lines
+        ctx.lineWidth = 1.0; // Çizgiler daha kalın
+        for(let i = 0; i < particles.length; i++) {
+            const p1 = particles[i];
+            if (p1.z <= 0 || p1.isShooter || !p1.x2d) continue;
+
+            for(let j = i + 1; j < particles.length; j++) {
+                const p2 = particles[j];
+                if (p2.z <= 0 || p2.isShooter || !p2.x2d) continue;
+                
+                // 3D derinlikleri çok farklıysa bağlama (gerçekçilik için)
+                if (Math.abs(p1.z - p2.z) > 400) continue;
+
+                // 2D ekran mesafesi
+                const dx = p1.x2d - p2.x2d;
+                const dy = p1.y2d - p2.y2d;
+                const dist2d = dx*dx + dy*dy;
+                
+                if (dist2d < 30000) { // Bağlantı mesafesi 3 katına çıkarıldı (daha çok çizgi)
+                    const opacity = 1 - (dist2d / 30000);
+                    const avgDepth = (p1.depthRatio + p2.depthRatio) / 2;
+                    // Çizgiler sitenin orijinal beyaz/gri temasıyla tamamen uyumlu hale getirildi
+                    ctx.strokeStyle = `rgba(255, 255, 255, ${opacity * avgDepth * 0.8})`;
+                    ctx.beginPath();
+                    ctx.moveTo(p1.x2d, p1.y2d);
+                    ctx.lineTo(p2.x2d, p2.y2d);
+                    ctx.stroke();
+                }
+            }
+        }
         requestAnimationFrame(animate);
     }
 
@@ -140,12 +227,18 @@ document.addEventListener('DOMContentLoaded', () => {
     resize();
     animate();
 
-    // Global Mouse Interaction (Fix: Window instead of heroSection)
+    // Global Mouse & Touch Interaction (Mobile support)
     window.addEventListener('mousemove', (e) => {
-        // We want mouse coordinates relative to the window, not just the canvas if it was absolute
-        // Since canvas is fixed 100vw/100vh, clientX/Y is perfect
         targetMouse.x = e.clientX;
         targetMouse.y = e.clientY;
+    });
+    
+    // Mobil kaydırma (touchmove) desteği
+    window.addEventListener('touchmove', (e) => {
+        if (e.touches && e.touches.length > 0) {
+            targetMouse.x = e.touches[0].clientX;
+            targetMouse.y = e.touches[0].clientY;
+        }
     });
 
     // Reset camera on leave
@@ -175,5 +268,29 @@ document.addEventListener('DOMContentLoaded', () => {
     }, { threshold: 0.1 });
 
     scrollElements.forEach(el => observer.observe(el));
+
+    // Cinematic Warp Speed with GSAP ScrollTrigger
+    if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+        gsap.registerPlugin(ScrollTrigger);
+
+        ScrollTrigger.create({
+            trigger: "body",
+            start: "top top",
+            end: "bottom bottom",
+            onUpdate: (self) => {
+                // When scrolling fast, increase the Z velocity of particles drastically
+                const velocity = Math.abs(self.getVelocity());
+                window.warpSpeedOffset = Math.min(velocity / 15, 120); // Cap max warp
+
+                // Kill ongoing tweens and ease back to 0
+                gsap.killTweensOf(window);
+                gsap.to(window, {
+                    warpSpeedOffset: 0,
+                    duration: 0.8,
+                    ease: "power2.out"
+                });
+            }
+        });
+    }
 
 });
