@@ -7,7 +7,7 @@
         hue: 0,           // 0 = white/gray lightning (monochrome theme)
         xOffset: 0,
         speed: 0.4,       // Daha yumuşak hareket için yavaşlatıldı (eski değer: 0.7)
-        intensity: 0.6,   // Işık gücü tekrar artırıldı
+        intensity: 0.15,   // Yıldırım ışık gücü düşürüldü (göz yormasını önlemek için)
         size: 2
     };
 
