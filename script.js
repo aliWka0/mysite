@@ -16,19 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let clickPulse = 0; // Tıklama ile oluşan şok dalgası enerjisi
     window.warpSpeedOffset = 0; // Cinematic scroll speed multiplier
 
-    // Tıklama Şok Dalgası (Shockwave) Events
-    // Basılı tutmayı iptal edip sadece tıklandığı an enerji patlaması yaratıyoruz
-    window.addEventListener('mousedown', () => clickPulse = 2.0);
-    window.addEventListener('touchstart', (e) => {
-        // Mobilde ilk dokunuşta karadelik rastgele bir yerde (eski mouse konumunda) oluşmasın diye hedefe anında atlar
-        if (e.touches && e.touches.length > 0) {
-            targetMouse.x = e.touches[0].clientX;
-            targetMouse.y = e.touches[0].clientY;
-            mouse.x = targetMouse.x;
-            mouse.y = targetMouse.y;
-        }
-        clickPulse = 2.0;
-    });
+    // Tıklama etkileri kaldırıldı
 
     function resize() {
         // Set canvas to full screen/window size to ensure global coverage
