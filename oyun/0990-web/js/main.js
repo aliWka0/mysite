@@ -456,6 +456,8 @@ function wireNetSession() {
     // Host tarafı: istemci girdisi
     netSession.onInput = (obj) => remoteController.applyInput(obj);
     netSession.onShoot = (obj) => remoteController.queueShoot(obj);
+    netSession.onUseItem = (obj) => remoteController.queueItem(obj);
+    netSession.onShield = () => remoteController.queueShield();
     // İstemci tarafı: host akışı
     netSession.onStart = () => { lanMenu.hide(); startNetGame('client'); };
     netSession.onSnap = (obj) => {
@@ -525,13 +527,15 @@ function startNetGame(role) {
     // N1: net oyun = sıra-tabanlı bilardo → sabotaj/kutu KAPALI (mode local2p).
     gameManager.reset();
     gameManager.setMode('local2p');
+    gameManager.humanPlayer = myPlayerNum;
+    gameManager.botPlayer = myPlayerNum === 1 ? 2 : 1;
     gameManager.currentPlayer = 1;
     gameManager.isBreakShot = true;
     if (itemSystem) itemSystem.reset();
     if (sabotageManager) sabotageManager.clearAll();
     if (comboSystem) { comboSystem.reset(); uiManager.updateUltimate(0, false); }
     if (itemBoxManager) itemBoxManager.setShown(false);   // kutular net modda yok (N1)
-    if (progression) progression.beginMatch(1);   // Faz 15: LAN host da XP kazanır (host = P1)
+    if (progression) progression.beginMatch(myPlayerNum);   // Faz 15: LAN host da XP kazanır
     uiManager.updatePlayerTypes(null, null);
     uiManager.updatePlayerBalls([], [], [], []);
 
@@ -659,6 +663,18 @@ function hostUpdateChars(dt, state, camFwd) {
 
     const inp2 = (walkStates && !players[2].isRagdoll) ? remoteController.moveInput : ZERO_MOVE;
     players[2].update(dt, inp2, remoteController.forward);
+
+    // LAN: İstemciden gelen kalkan ve item/yetenek isteklerini sunucu dünyasında simüle et
+    if (walkStates && !players[2].isRagdoll) {
+        const rcShield = remoteController.consumeShield();
+        if (rcShield) {
+            useItemAt(2, 'saboteur');
+        }
+        const rcItem = remoteController.consumeItem();
+        if (rcItem) {
+            useItemAt(2, rcItem.role);
+        }
+    }
 
     // İstemci atışı: yalnız kendi sırasında + WALKING + tekme atmıyorken.
     if (active === 2 && state === GAME_STATES.WALKING && !players[2].isKicking) {
@@ -1218,6 +1234,19 @@ function useHumanItem() {
     if (eventManager && eventManager.isShotLocked()) return;   // dev top geçerken aksiyon yok
     const role = humanActiveRole();
     if (!role) return;
+
+    // LAN: İstemci yetenek kullanmak isterse bunu sunucuya iletir, yerelde çalıştırmaz.
+    if (netRole === 'client' && netSession && netSession.connected) {
+        const def = itemSystem.getItem(myPlayerNum);
+        if (!def) return;
+        if (def.id === 'shield') {
+            netSession.send({ t: MSG.SHIELD });
+        } else {
+            netSession.send({ t: MSG.USEITEM, role });
+        }
+        return;
+    }
+
     const def = itemSystem.getItem(gameManager.humanPlayer);   // kullanmadan önce yakala
     const used = useItemAt(gameManager.humanPlayer, role);
     // Kalkan açılışı: cam-göbeği kenar glow'u (korunma hissi). Kabuk zaten görünür.

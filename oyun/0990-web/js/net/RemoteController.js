@@ -14,6 +14,7 @@ export class RemoteController {
         this._pendingShoot = null;   // {aim, power} | null
         this._pendingItem = null;    // {role} | null  (N2)
         this._pendingShield = false; // (N2)
+        this.isDashing = false;      // dash/turbo durumu
         this._lastInputAt = 0;       // bağlantı sağlığı (gerekirse)
     }
 
@@ -24,6 +25,7 @@ export class RemoteController {
             const x = obj.fwd[0], z = obj.fwd[1];
             if (Math.hypot(x, z) > 1e-4) this.forward.set(x, 0, z).normalize();
         }
+        if (obj.ds !== undefined) this.isDashing = !!obj.ds;
         this._lastInputAt = performance.now();
     }
 
