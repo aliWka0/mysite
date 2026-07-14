@@ -1,8 +1,9 @@
 // ============================================
 // NetSync — anlık görüntü (snapshot) kur/uygula
 // ============================================
-// HOST her ~25Hz'de buildSnapshot ile dünyanın özetini (iki karakter + aktif toplar
-// + durum) kodlar; İSTEMCİ applySnapshot ile bunu fizik çalıştırmadan çizer.
+// HOST her ~30Hz'de buildSnapshot ile dünyanın özetini (iki karakter + aktif toplar
+// + durum) kodlar; İSTEMCİ applySnapshot ile bunu çizer.
+// v2: Toplara hız (vx,vz) eklendi → istemci yerel fizik tahmini yapabilir.
 // Konum yumuşatma Player.applyNet/Balls.syncWithPhysics içinde. JSON taşınır;
 // değerler 4 ondalığa yuvarlanır (0.1mm hassasiyet — yeterli, bayt düşük).
 
@@ -15,10 +16,14 @@ function encodePlayer(p) {
     return o;
 }
 
-/** HOST: dünyayı snapshot objesine kodla. */
+/** HOST: dünyayı snapshot objesine kodla. v2: top hızları da gönderiliyor. */
 export function buildSnapshot(players, ballPhysics, gameManager) {
     const b = [];
-    ballPhysics.getPositions().forEach((pos, id) => b.push([id, r(pos.x), r(pos.y), r(pos.z)]));
+    for (const [id, body] of ballPhysics.bodies) {
+        const p = body.position;
+        const v = body.velocity;
+        b.push([id, r(p.x), r(p.y), r(p.z), r(v.x), r(v.z)]);
+    }
     return {
         t: 'snap',
         pl: [encodePlayer(players[1]), encodePlayer(players[2])],
@@ -91,5 +96,53 @@ export function applySnapshotLerp(s0, s1, alpha, dt, players, balls) {
         }
         balls.syncWithPhysics(map);
         for (const id of balls.getAllActiveBallIds()) if (!present.has(id)) balls.removeBall(id);
+    }
+}
+
+/**
+ * İSTEMCİ: Snapshot'tan gelen top hızlarını yerel fizik motoruna uygula.
+ * Bu sayede istemci kendi fiziğini çalıştırarak snapshot'lar arası
+ * pürüzsüz hareket sağlar. Pozisyonlar da düzeltilir (smooth correction).
+ */
+export function applyBallCorrections(snap, ballPhysics) {
+    if (!snap.b) return;
+    const present = new Set();
+    for (const it of snap.b) {
+        const id = it[0];
+        present.add(id);
+        const body = ballPhysics.getBallBody(id);
+        if (!body) continue;
+
+        const sx = it[1], sy = it[2], sz = it[3];
+        const svx = it[4] || 0, svz = it[5] || 0;
+
+        // Pozisyon düzeltme: ani ışınlama yerine yumuşak çekme (lerp).
+        // Büyük fark varsa (>top çapı) doğrudan ışınla (cue ball reset gibi).
+        const dx = sx - body.position.x;
+        const dz = sz - body.position.z;
+        const distSq = dx * dx + dz * dz;
+
+        if (distSq > 0.04) {
+            // Büyük sapma → doğrudan ışınla
+            body.position.x = sx;
+            body.position.y = sy;
+            body.position.z = sz;
+        } else {
+            // Küçük sapma → yumuşak düzeltme (%40 yaklaş)
+            body.position.x += dx * 0.4;
+            body.position.z += dz * 0.4;
+        }
+        body.position.y = sy;
+
+        // Hızı sunucudan al (istemci fiziği bu hızlarla devam eder)
+        body.velocity.x = svx;
+        body.velocity.y = 0;
+        body.velocity.z = svz;
+    }
+    // Sunucuda olmayan topları kaldır (pot edilmiş)
+    for (const [id] of ballPhysics.bodies) {
+        if (!present.has(id)) {
+            ballPhysics.removeBall(id);
+        }
     }
 }

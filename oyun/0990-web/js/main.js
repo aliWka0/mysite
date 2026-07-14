@@ -37,7 +37,7 @@ import { FinisherEffect } from './scene/FinisherEffect.js';
 import { NetSession } from './net/NetSession.js';
 import { RemoteController } from './net/RemoteController.js';
 import { Matchmaker } from './net/Matchmaker.js';
-import { buildSnapshot, applySnapshot, applySnapshotLerp } from './net/NetSync.js';
+import { buildSnapshot, applySnapshot, applySnapshotLerp, applyBallCorrections } from './net/NetSync.js';
 import { MSG, SNAP_HZ, INPUT_HZ } from './net/NetProtocol.js';
 import { DEFAULT_PORT } from './net/NetTransport.js';
 import { LanMenu } from './ui/LanMenu.js';
@@ -75,7 +75,8 @@ let netRole = null;          // null | 'host' | 'client'
 let myPlayerNum = 1;         // host bu cihazda players[1]'i, istemci players[2]'yi sürer
 let _lastSnap = null;        // istemci: en son alınan snapshot (st/cp okumaları için)
 let _snapBuf = [];           // istemci: [{t, snap}] interpolasyon tamponu (jitter yutar)
-const INTERP_DELAY = 0.18;   // s — render bu kadar geriden (İnternet pingini yumuşatır, takılmaları keser)
+const INTERP_DELAY = 0.10;   // s — render bu kadar geriden (client-side prediction ile düşürüldü)
+let _clientBallsMoving = false; // istemci: toplar hareket halinde mi (yerel fizik çalıştırılacak)
 let _snapAccum = 0;          // host: snapshot gönderim biriktirici (SNAP_HZ)
 let _inputAccum = 0;         // istemci: girdi gönderim biriktirici (INPUT_HZ)
 let _clientCharging = false; // istemci: kendi sırasında güç şarjı açık mı
@@ -460,7 +461,14 @@ function wireNetSession() {
     netSession.onSnap = (obj) => {
         _lastSnap = obj;
         _snapBuf.push({ t: performance.now() / 1000, snap: obj });
-        if (_snapBuf.length > 20) _snapBuf.shift();   // ~0.6s pencere yeterli
+        if (_snapBuf.length > 30) _snapBuf.shift();   // ~1s pencere (internet jitter için)
+        // İstemci fizik tahmini: her snapshot'ta top hızlarını ve pozisyon düzeltmelerini uygula
+        if (netRole === 'client' && ballPhysics) {
+            applyBallCorrections(obj, ballPhysics);
+            // Toplar hareket halindeyse yerel fizik motoru açılsın
+            const st = obj.st ? obj.st.s : null;
+            _clientBallsMoving = (st === GAME_STATES.BALLS_MOVING || st === GAME_STATES.SHOOTING);
+        }
     };
     netSession.onEvent = (obj) => onNetEvent(obj);
     netSession.onBye = () => onNetDisconnect();
@@ -658,8 +666,19 @@ function hostUpdateChars(dt, state, camFwd) {
 
 /** İstemci kare: simülasyon yok — snapshot çiz + girdi yolla + kamera + render. */
 function netClientFrame(dt, dx, dy, scroll) {
-    // İnterpolasyon: render zamanını ~INTERP_DELAY geri al, o ana denk gelen iki
-    // snapshot arası yumuşat (WiFi jitter'ı yutulur → akıcı hareket).
+    // ---- İSTEMCİ TARAFLI FİZİK TAHMİNİ (Client-Side Prediction) ----
+    // Toplar hareket halindeyken istemci KENDİ yerel fiziğini çalıştırır.
+    // Snapshot geldiğinde pozisyonlar + hızlar düzeltilir (applyBallCorrections).
+    // Bu sayede toplar 60 FPS'de pürüzsüz hareket eder.
+    if (_clientBallsMoving && ballPhysics) {
+        physicsWorld.step(dt);
+        ballPhysics.clampToSurface();
+        const positions = ballPhysics.getPositions();
+        const quaternions = ballPhysics.getQuaternions();
+        balls.syncWithPhysics(positions, quaternions);
+    }
+
+    // Karakter interpolasyonu: snapshot tabanlı (hâlâ geçerli — karakterler fizik tahmini gerektirmez)
     const renderT = performance.now() / 1000 - INTERP_DELAY;
     let s0 = null, s1 = null;
     for (let i = _snapBuf.length - 1; i >= 1; i--) {
@@ -670,10 +689,56 @@ function netClientFrame(dt, dx, dy, scroll) {
     if (s0 && s1) {
         const span = s1.t - s0.t;
         const alpha = span > 1e-4 ? Math.min(1, Math.max(0, (renderT - s0.t) / span)) : 1;
-        applySnapshotLerp(s0.snap, s1.snap, alpha, dt, players, balls);
+        // Sadece karakterleri interpolasyonla güncelle (toplar zaten yerel fizikle güncelleniyor)
+        if (s0.snap.pl && s1.snap.pl) {
+            const lA = (e0, e1, a, d, p) => {
+                if (!e0 || !e1) return;
+                const x = e0.p[0] + (e1.p[0] - e0.p[0]) * a;
+                const y = e0.p[1] + (e1.p[1] - e0.p[1]) * a;
+                const z = e0.p[2] + (e1.p[2] - e0.p[2]) * a;
+                let dd = e1.r - e0.r;
+                while (dd > Math.PI) dd -= 2 * Math.PI;
+                while (dd < -Math.PI) dd += 2 * Math.PI;
+                const ry = e0.r + dd * a;
+                p.applyNet(d, x, y, z, ry, e1.a, !!e1.g, e1.q);
+            };
+            lA(s0.snap.pl[0], s1.snap.pl[0], alpha, dt, players[1]);
+            lA(s0.snap.pl[1], s1.snap.pl[1], alpha, dt, players[2]);
+        }
+        // Toplar hareket halinde DEĞİLSE eski yöntemle güncelle (duran toplar)
+        if (!_clientBallsMoving && s1.snap.b) {
+            const m0 = new Map();
+            if (s0.snap.b) for (const it of s0.snap.b) m0.set(it[0], it);
+            const map = new Map();
+            const present = new Set();
+            for (const it1 of s1.snap.b) {
+                const id = it1[0]; present.add(id);
+                const it0 = m0.get(id) || it1;
+                map.set(id, {
+                    x: it0[1] + (it1[1] - it0[1]) * alpha,
+                    y: it0[2] + (it1[2] - it0[2]) * alpha,
+                    z: it0[3] + (it1[3] - it0[3]) * alpha,
+                });
+            }
+            balls.syncWithPhysics(map);
+            for (const id of balls.getAllActiveBallIds()) if (!present.has(id)) balls.removeBall(id);
+        }
     } else if (_lastSnap) {
-        applySnapshot(_lastSnap, dt, players, balls);   // tampon yetersiz → en sonu çiz
+        // Tampon yetersiz — karakter verilerini doğrudan uygula
+        if (_lastSnap.pl) {
+            const a = _lastSnap.pl[0], c = _lastSnap.pl[1];
+            if (a) players[1].applyNet(dt, a.p[0], a.p[1], a.p[2], a.r, a.a, !!a.g, a.q);
+            if (c) players[2].applyNet(dt, c.p[0], c.p[1], c.p[2], c.r, c.a, !!c.g, c.q);
+        }
+        if (!_clientBallsMoving && _lastSnap.b) {
+            const map = new Map();
+            const present = new Set();
+            for (const it of _lastSnap.b) { map.set(it[0], { x: it[1], y: it[2], z: it[3] }); present.add(it[0]); }
+            balls.syncWithPhysics(map);
+            for (const id of balls.getAllActiveBallIds()) if (!present.has(id)) balls.removeBall(id);
+        }
     }
+
     const st = _lastSnap && _lastSnap.st ? _lastSnap.st : null;
     const cp = st ? st.cp : 1;
     const sState = st ? st.s : GAME_STATES.WALKING;
@@ -2183,8 +2248,12 @@ function gameLoop(time) {
 
     // ---- LAN HOST: dünyanın anlık görüntüsünü istemciye yolla (~SNAP_HZ) ----
     if (netRole === 'host' && netSession.connected) {
+        // Toplar hareket halindeyken snapshot hızını 60Hz'e çıkar (daha hassas düzeltme)
+        const state = gameManager.getState();
+        const dynamicHz = (state === GAME_STATES.BALLS_MOVING || state === GAME_STATES.SHOOTING)
+            ? 60 : SNAP_HZ;
         _snapAccum += dt;
-        if (_snapAccum >= 1 / SNAP_HZ) {
+        if (_snapAccum >= 1 / dynamicHz) {
             _snapAccum = 0;
             netSession.send(buildSnapshot(players, ballPhysics, gameManager));
         }
