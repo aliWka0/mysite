@@ -7,7 +7,7 @@
         hue: 0,           // 0 = white/gray lightning (monochrome theme)
         xOffset: 0,
         speed: 0.4,       // Daha yumuşak hareket için yavaşlatıldı (eski değer: 0.7)
-        intensity: 0.015,   // Yıldırım ışık gücü neredeyse tamamen karartıldı
+        intensity: 0.2,   // Dengeli orta parlaklık düzeyi (görünürlük artırıldı)
         size: 2
     };
 
@@ -148,7 +148,7 @@
                 float currentIntensity = uIntensity * (1.0 + uWarp * 0.005 + mouseAura * 0.2); // Farenin altında hafif aydınlanma
                 
                 // Titremeyi önleyen sabit ışık kalınlığı ve dalların birleştirilmesi
-                float lightThickness = 0.008 + (uWarp * 0.0001); // Kalınlık kılcal seviyeye çekildi
+                float lightThickness = 0.032 + (uWarp * 0.0001); // Kalınlık dengeli düzeye getirildi
                 float core = lightThickness / dist;
                 float branch1 = (lightThickness * 0.25) / dist2; 
                 float branch2 = (lightThickness * 0.15) / dist3;
