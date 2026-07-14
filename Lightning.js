@@ -4,7 +4,7 @@
 (function () {
     // Configuration - adapts to black/gray/white theme
     const config = {
-        hue: 0,           // 0 = white/gray lightning (monochrome theme)
+        hue: 215,         // 215 = Buz mavisi / Elektrik rengi (hue derecesi)
         xOffset: 0,
         speed: 0.4,       // Daha yumuşak hareket için yavaşlatıldı (eski değer: 0.7)
         intensity: 0.22,   // Yıldırım ışık gücü
