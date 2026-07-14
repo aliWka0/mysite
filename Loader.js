@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 // Animate Intensity from 0 to 0.6
                                 if (window.setLightningIntensity) {
                                     let intensity = 0;
-                                    const targetIntensity = 0.6;
+                                    const targetIntensity = 0.22;
                                     const duration = 2000; // 2 seconds
                                     const startTime = performance.now();
 
