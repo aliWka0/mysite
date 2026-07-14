@@ -666,19 +666,29 @@ function hostUpdateChars(dt, state, camFwd) {
 
 /** İstemci kare: simülasyon yok — snapshot çiz + girdi yolla + kamera + render. */
 function netClientFrame(dt, dx, dy, scroll) {
-    // ---- İSTEMCİ TARAFLI FİZİK TAHMİNİ (Client-Side Prediction) ----
-    // Toplar hareket halindeyken istemci KENDİ yerel fiziğini çalıştırır.
-    // Snapshot geldiğinde pozisyonlar + hızlar düzeltilir (applyBallCorrections).
-    // Bu sayede toplar 60 FPS'de pürüzsüz hareket eder.
-    if (_clientBallsMoving && ballPhysics) {
-        physicsWorld.step(dt);
-        ballPhysics.clampToSurface();
+    // ---- TOP HAREKETİ: Hız ekstrapolasyonu (CANNON fiziği YOK) ----
+    // Toplar hareket halindeyken, son snapshot'tan gelen hızlarla düz çizgide ilerlet.
+    // Fizik motoru KULLANMIYORUZ çünkü host ile istemcinin fizik motorları
+    // zamanlama farkları yüzünden farklı sonuçlar üretir → toplar zıplar.
+    // Yerine: her snapshot'ta pozisyon + hız doğrudan alınır, arada lineer ilerletilir.
+    if (_clientBallsMoving && _lastSnap && _lastSnap.b) {
+        // _clientBallVels: snapshot'tan gelen hızları kullanarak topları ilerlet
+        for (const it of _lastSnap.b) {
+            const id = it[0];
+            const vx = it[4] || 0, vz = it[5] || 0;
+            // Hız sıfıra yakınsa ilerletmeye gerek yok
+            if (Math.abs(vx) < 0.001 && Math.abs(vz) < 0.001) continue;
+            const body = ballPhysics.getBallBody(id);
+            if (!body) continue;
+            body.position.x += vx * dt;
+            body.position.z += vz * dt;
+        }
         const positions = ballPhysics.getPositions();
         const quaternions = ballPhysics.getQuaternions();
         balls.syncWithPhysics(positions, quaternions);
     }
 
-    // Karakter interpolasyonu: snapshot tabanlı (hâlâ geçerli — karakterler fizik tahmini gerektirmez)
+    // ---- KARAKTER İNTERPOLASYONU ----
     const renderT = performance.now() / 1000 - INTERP_DELAY;
     let s0 = null, s1 = null;
     for (let i = _snapBuf.length - 1; i >= 1; i--) {
@@ -689,7 +699,7 @@ function netClientFrame(dt, dx, dy, scroll) {
     if (s0 && s1) {
         const span = s1.t - s0.t;
         const alpha = span > 1e-4 ? Math.min(1, Math.max(0, (renderT - s0.t) / span)) : 1;
-        // Sadece karakterleri interpolasyonla güncelle (toplar zaten yerel fizikle güncelleniyor)
+        // Karakterleri interpolasyonla güncelle
         if (s0.snap.pl && s1.snap.pl) {
             const lA = (e0, e1, a, d, p) => {
                 if (!e0 || !e1) return;
@@ -705,7 +715,7 @@ function netClientFrame(dt, dx, dy, scroll) {
             lA(s0.snap.pl[0], s1.snap.pl[0], alpha, dt, players[1]);
             lA(s0.snap.pl[1], s1.snap.pl[1], alpha, dt, players[2]);
         }
-        // Toplar hareket halinde DEĞİLSE eski yöntemle güncelle (duran toplar)
+        // Toplar duruyorsa snapshot interpolasyonu kullan
         if (!_clientBallsMoving && s1.snap.b) {
             const m0 = new Map();
             if (s0.snap.b) for (const it of s0.snap.b) m0.set(it[0], it);
@@ -724,7 +734,6 @@ function netClientFrame(dt, dx, dy, scroll) {
             for (const id of balls.getAllActiveBallIds()) if (!present.has(id)) balls.removeBall(id);
         }
     } else if (_lastSnap) {
-        // Tampon yetersiz — karakter verilerini doğrudan uygula
         if (_lastSnap.pl) {
             const a = _lastSnap.pl[0], c = _lastSnap.pl[1];
             if (a) players[1].applyNet(dt, a.p[0], a.p[1], a.p[2], a.r, a.a, !!a.g, a.q);
