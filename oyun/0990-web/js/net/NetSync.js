@@ -11,7 +11,10 @@ const r = (v) => Math.round(v * 1e4) / 1e4;
 
 function encodePlayer(p) {
     const b = p.body.position;
-    const o = { p: [r(b.x), r(b.y), r(b.z)], r: r(p.mesh.rotation.y), a: p.getNetAnim(), g: p.isRagdoll ? 1 : 0 };
+    let ry = p.mesh.rotation.y;
+    while (ry > Math.PI) ry -= 2 * Math.PI;
+    while (ry < -Math.PI) ry += 2 * Math.PI;
+    const o = { p: [r(b.x), r(b.y), r(b.z)], r: r(ry), a: p.getNetAnim(), g: p.isRagdoll ? 1 : 0 };
     if (p.isRagdoll) { const q = p.body.quaternion; o.q = [r(q.x), r(q.y), r(q.z), r(q.w)]; }
     return o;
 }

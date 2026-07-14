@@ -709,8 +709,15 @@ function netClientFrame(dt, dx, dy, scroll) {
             body.position.y = sy;
 
             // ROTASYON EŞİTLEMESİ (Geri geri koşma & Yön sapması koruması):
-            // Kendi rotasyonumuzu da sunucunun rotasyonuna yumuşakça yaklaştırıyoruz (%15)
-            let diffRot = mySnap.r - players[myPlayerNum].mesh.rotation.y;
+            // Her iki açıyı da [-PI, PI] aralığına normalize edip farkı alarak yumuşak eşitleme yapıyoruz (%15)
+            let targetRot = mySnap.r;
+            let currentRot = players[myPlayerNum].mesh.rotation.y;
+            while (targetRot > Math.PI) targetRot -= 2 * Math.PI;
+            while (targetRot < -Math.PI) targetRot += 2 * Math.PI;
+            while (currentRot > Math.PI) currentRot -= 2 * Math.PI;
+            while (currentRot < -Math.PI) currentRot += 2 * Math.PI;
+
+            let diffRot = targetRot - currentRot;
             while (diffRot > Math.PI) diffRot -= 2 * Math.PI;
             while (diffRot < -Math.PI) diffRot += 2 * Math.PI;
             players[myPlayerNum].mesh.rotation.y += diffRot * 0.15;
