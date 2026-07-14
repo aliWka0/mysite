@@ -461,17 +461,7 @@ function wireNetSession() {
     netSession.onSnap = (obj) => {
         _lastSnap = obj;
         
-        // İstemci tarafında kamera 180 derece ters açıda olduğu için sunucudan gelen
-        // RAKİP karakterin (pl[0] - Host) rotasyonuna her zaman 180 derece (Math.PI) ekliyoruz.
-        // Kendi karakterimiz (pl[1] - Client) zaten bizim kameramıza göre ters açıyla
-        // simüle edildiği için onun rotasyonuna dokunmuyoruz.
-        if (netRole === 'client' && obj.pl && obj.pl[0]) {
-            const opp = obj.pl[0];
-            opp.r = opp.r + Math.PI;
-            // [-PI, PI] aralığına normalize et
-            while (opp.r > Math.PI) opp.r -= 2 * Math.PI;
-            while (opp.r < -Math.PI) opp.r += 2 * Math.PI;
-        }
+        // snapshot'ı doğrudan tampona ekle (hiçbir suni rotasyon eklemesi yapmıyoruz)
 
         _snapBuf.push({ t: performance.now() / 1000, snap: obj });
         if (_snapBuf.length > 30) _snapBuf.shift();   // ~1s pencere (internet jitter için)
