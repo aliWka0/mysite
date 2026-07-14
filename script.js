@@ -189,36 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
             p.draw(ctx);
         });
 
-        // Draw Constellation / Network Lines
-        ctx.lineWidth = 1.0; // Çizgiler daha kalın
-        for(let i = 0; i < particles.length; i++) {
-            const p1 = particles[i];
-            if (p1.z <= 0 || p1.isShooter || !p1.x2d) continue;
-
-            for(let j = i + 1; j < particles.length; j++) {
-                const p2 = particles[j];
-                if (p2.z <= 0 || p2.isShooter || !p2.x2d) continue;
-                
-                // 3D derinlikleri çok farklıysa bağlama (gerçekçilik için)
-                if (Math.abs(p1.z - p2.z) > 400) continue;
-
-                // 2D ekran mesafesi
-                const dx = p1.x2d - p2.x2d;
-                const dy = p1.y2d - p2.y2d;
-                const dist2d = dx*dx + dy*dy;
-                
-                if (dist2d < 30000) { // Bağlantı mesafesi 3 katına çıkarıldı (daha çok çizgi)
-                    const opacity = 1 - (dist2d / 30000);
-                    const avgDepth = (p1.depthRatio + p2.depthRatio) / 2;
-                    // Çizgiler sitenin orijinal beyaz/gri temasıyla tamamen uyumlu hale getirildi
-                    ctx.strokeStyle = `rgba(255, 255, 255, ${opacity * avgDepth * 0.8})`;
-                    ctx.beginPath();
-                    ctx.moveTo(p1.x2d, p1.y2d);
-                    ctx.lineTo(p2.x2d, p2.y2d);
-                    ctx.stroke();
-                }
-            }
-        }
+        // Draw Constellation / Network Lines (Kaldırıldı - Göz yormayı önlemek için)
         requestAnimationFrame(animate);
     }
 
