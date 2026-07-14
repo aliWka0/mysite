@@ -460,6 +460,20 @@ function wireNetSession() {
     netSession.onStart = () => { lanMenu.hide(); startNetGame('client'); };
     netSession.onSnap = (obj) => {
         _lastSnap = obj;
+        
+        // İstemci tarafında kamera 180 derece ters açıda olduğu için sunucudan gelen
+        // tüm karakter rotasyonlarına 180 derece (Math.PI) ekleyerek düzeltiyoruz.
+        if (netRole === 'client' && obj.pl) {
+            obj.pl.forEach(p => {
+                if (p) {
+                    p.r = p.r + Math.PI;
+                    // [-PI, PI] aralığına normalize et
+                    while (p.r > Math.PI) p.r -= 2 * Math.PI;
+                    while (p.r < -Math.PI) p.r += 2 * Math.PI;
+                }
+            });
+        }
+
         _snapBuf.push({ t: performance.now() / 1000, snap: obj });
         if (_snapBuf.length > 30) _snapBuf.shift();   // ~1s pencere (internet jitter için)
         // İstemci fizik tahmini: her snapshot'ta top hızlarını ve pozisyon düzeltmelerini uygula
