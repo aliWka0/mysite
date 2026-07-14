@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="description" content="3D 8-Ball Pool Game — Play billiards in your browser with realistic physics">
+    <title>8-Ball Pool 3D</title>
+    <!-- Outfit fontu artık css/style.css içinde yerel @font-face ile (çevrimdışı). -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- 3D Canvas -->
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="loading-content">
+            <div class="loading-icon">🎱</div>
+            <h1>8-BALL POOL</h1>
+            <div class="loading-bar">
+                <div class="loading-fill"></div>
+            </div>
+            <p class="loading-text">Loading...</p>
+        </div>
+    </div>
+
+    <!-- Top HUD -->
+    <div id="hud-top" class="hidden">
+        <div id="player1-panel" class="player-panel active">
+            <div class="player-header">
+                <div class="player-indicator"></div>
+                <span class="player-name">Player 1</span>
+            </div>
+            <span class="player-type" id="p1-type"></span>
+            <div class="player-balls" id="p1-balls"></div>
+        </div>
+        <div id="turn-indicator">
+            <span id="turn-text">BREAK SHOT</span>
+        </div>
+        <div id="player2-panel" class="player-panel">
+            <div class="player-header">
+                <div class="player-indicator"></div>
+                <span class="player-name">Player 2</span>
+            </div>
+            <span class="player-type" id="p2-type"></span>
+            <div class="player-balls" id="p2-balls"></div>
+        </div>
+    </div>
+
+    <!-- Screen-edge glow flash (juice): colored vignette pulse on events
+         (red=sabotaged, green=pot, cyan=pickup, amber=foul…). Driven by
+         UIManager.flashEdge; pure overlay, never blocks input. -->
+    <div id="screen-flash"></div>
+
+    <!-- Final-evresi gerilim vinyeti (Faz 10): son top kalınca nabız atan kırmızı
+         kenar karartması. body.final-phase iken görünür/pulse; saf overlay. -->
+    <div id="final-vignette"></div>
+
+    <!-- Mini-olay ekran tinti (Faz 13): aktif çevre olayının renginde (buz=cam göbeği,
+         ağır=kahve, zıpzıp=macenta) yavaş nabız atan kenar. UIManager.setEventTint
+         .active class'ını + --event-color değişkenini ayarlar; saf overlay. -->
+    <div id="event-tint"></div>
+
+    <!-- Event toast — compact pill at top-center, sits over the turn indicator
+         (not a giant center overlay). Brief, auto-dismiss. -->
+    <div id="notification" class="hidden">
+        <div class="notification-content">
+            <div id="notification-icon"></div>
+            <div class="notif-text">
+                <div id="notification-text"></div>
+                <div id="notification-subtext"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ultimate energy meter (Faz 6) — bottom-center slim bar; fills from combo
+         actions (pot/knock/pickup). "COMBO xN" pops above it. Glows when ULTI ready
+         (Faz 7 will trigger the ultimate). Shown/hidden with the HUD. -->
+    <div id="ultimate-hud" class="hidden">
+        <div id="combo-pop"></div>
+        <div id="ulti-bar">
+            <div id="ulti-fill"></div>
+            <span id="ulti-label">ULTI</span>
+        </div>
+    </div>
+
+    <!-- Power Bar -->
+    <div id="power-bar-container" class="hidden">
+        <span id="power-label">SHOT POWER</span>
+        <div id="power-bar-track">
+            <div id="power-bar-fill"></div>
+        </div>
+    </div>
+
+    <!-- Item slot — shown only while the human is the saboteur (opponent's turn).
+         Holds one item (e.g. 🍌); USE-ITEM button / 'E' uses it. -->
+    <div id="item-slot" class="hidden empty">
+        <div class="item-slot-inner">
+            <span class="item-slot-icon">·</span>
+            <div class="item-slot-cd"></div>
+        </div>
+        <span class="item-slot-label">EŞYA</span>
+    </div>
+
+    <!-- Controls Help -->
+    <div id="controls-help" class="hidden">
+        <span>Hold Left Click: Charge Power · Release: Shoot</span>
+    </div>
+
+    <!-- Crosshair -->
+    <div id="crosshair" class="hidden">
+        <div class="dot"></div>
+        <div class="ring"></div>
+    </div>
+
+    <!-- Game Over Screen (Faz 15: + XP/coin ödül paneli, animasyonlu) -->
+    <div id="game-over-screen" class="hidden">
+        <div class="game-over-content">
+            <div class="trophy">🏆</div>
+            <h1 id="winner-text">Player 1 Wins!</h1>
+            <p id="win-reason"></p>
+
+            <div id="go-rewards" class="hidden">
+                <ul class="go-breakdown" id="go-breakdown"></ul>
+                <div class="go-meta">
+                    <span class="go-coins">🪙 +<b id="go-coin-count">0</b></span>
+                    <span class="go-xp-gain">+<b id="go-xp-gain">0</b> XP</span>
+                </div>
+                <div class="go-level-row">
+                    <span class="go-lvl" id="go-lvl-label">LVL 1</span>
+                    <div class="go-xpbar"><div id="go-xpbar-fill"></div></div>
+                </div>
+                <div class="go-levelup hidden" id="go-levelup">⬆ LEVEL UP!</div>
+            </div>
+
+            <button id="restart-btn">PLAY AGAIN</button>
+        </div>
+    </div>
+
+    <!-- ===== Main Menu (Rocket League–style live 3D backdrop) ===== -->
+    <div id="main-menu" class="hidden">
+        <div class="mm-topbar">
+            <div class="mm-logo"><span class="mm-logo-icon">🎱</span> 8-BALL <b>POOL 3D</b></div>
+            <!-- Profil sağ üstte (kullanıcı isteği 2026-07-03: sol altta EXIT'e biniyordu) -->
+            <div class="mm-profile">
+                <div class="mm-avatar">🎱</div>
+                <div class="mm-pinfo">
+                    <span class="mm-pname">Player</span>
+                    <span class="mm-plvl" id="mm-plvl">LVL 1</span>
+                </div>
+                <div class="mm-coins" id="mm-coins">🪙 0</div>
+            </div>
+        </div>
+
+        <div class="mm-body">
+            <nav class="mm-nav" id="mm-nav">
+                <button class="mm-item is-active" data-menu="play">
+                    <span class="mm-ico">▶</span><span class="mm-label">Play</span>
+                </button>
+                <button class="mm-item is-finisher" data-menu="finishers">
+                    <span class="mm-ico">◉</span><span class="mm-label">Finishers</span>
+                </button>
+                <button class="mm-item is-locked" data-menu="garage" data-locked="1">
+                    <span class="mm-ico">◆</span><span class="mm-label">Garage</span><span class="mm-soon">SOON</span>
+                </button>
+                <button class="mm-item" data-menu="howto">
+                    <span class="mm-ico">?</span><span class="mm-label">How to Play</span>
+                </button>
+                <button class="mm-item" data-menu="options">
+                    <span class="mm-ico">⚙</span><span class="mm-label">Options</span>
+                </button>
+                <button class="mm-item" data-menu="exit">
+                    <span class="mm-ico">⏻</span><span class="mm-label">Exit</span>
+                </button>
+            </nav>
+
+        </div>
+
+        <!-- ===== LAN-stili menü SAYFALARI (2026-07-03) =====
+             Nav'a tıklanınca yan panel yerine ortada kart-sayfa açılır (İki Cihaz LAN
+             ekranıyla aynı dil: karartılmış zemin + ortalanmış kart + ‹ Geri). -->
+
+        <!-- PLAY -->
+        <div class="mm-page hidden" id="mm-page-play">
+            <div class="mmp-card">
+                <button class="mmp-back" data-back>‹ Geri</button>
+                <h2 class="mmp-title">Play</h2>
+                <p class="mmp-sub">Bir oyun modu seç</p>
+                <div class="mmp-grid">
+                    <button class="mmp-big" data-action="vsbot">
+                        <span class="mmp-big-ico">🤖</span>
+                        <span class="mmp-big-name">vs Bot</span>
+                        <span class="mmp-big-desc">Yapay zekâya karşı — sabotajlı</span>
+                    </button>
+                    <button class="mmp-big" data-action="local2p">
+                        <span class="mmp-big-ico">👥</span>
+                        <span class="mmp-big-name">Local 2P</span>
+                        <span class="mmp-big-desc">Aynı cihazda sırayla</span>
+                    </button>
+                    <button class="mmp-big" data-action="lan">
+                        <span class="mmp-big-ico">📡</span>
+                        <span class="mmp-big-name">İki Cihaz (LAN)</span>
+                        <span class="mmp-big-desc">Aynı WiFi'de iki telefon</span>
+                    </button>
+                    <button class="mmp-big" data-action="practice">
+                        <span class="mmp-big-ico">🎯</span>
+                        <span class="mmp-big-name">Practice</span>
+                        <span class="mmp-big-desc">Tek başına serbest antrenman</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- FINISHERS (Faz 14 — liste + canlı 3D önizleme) -->
+        <div class="mm-page hidden" id="mm-page-finishers">
+            <div class="mmp-card mmp-card-wide">
+                <button class="mmp-back" data-back>‹ Geri</button>
+                <h2 class="mmp-title mm-title-finisher">Finishers</h2>
+                <div class="mm-fin-layout">
+                    <div class="mm-fin-list" id="mm-finisher-list"></div>
+                    <div class="mm-fin-preview">
+                        <div class="mm-fin-stage">
+                            <canvas id="mm-fin-canvas"></canvas>
+                            <span class="mm-fin-live">CANLI ÖNİZLEME</span>
+                        </div>
+                        <div class="mm-fin-pv-title" id="mm-fin-pv-title"></div>
+                        <p class="mm-fin-pv-desc" id="mm-fin-pv-desc"></p>
+                        <button class="mm-fin-select" id="mm-fin-select">SEÇ</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- HOW TO PLAY -->
+        <div class="mm-page hidden" id="mm-page-howto">
+            <div class="mmp-card">
+                <button class="mmp-back" data-back>‹ Geri</button>
+                <h2 class="mmp-title">How to Play</h2>
+                <p class="mm-howto-goal">🎯 Kendi grubunu (düz ya da çizgili) sok, en sona <b>8 numarayı</b> bırak ve onu da sokan kazanır.</p>
+                <ul class="mm-howto" id="mm-howto-list"></ul>
+                <p class="mm-howto-foul">⚠️ Beyaz topu cebe düşürmek veya önce yanlış gruptan topa vurmak <b>faul</b> — sıra rakibe geçer.</p>
+            </div>
+        </div>
+
+        <!-- OPTIONS -->
+        <div class="mm-page hidden" id="mm-page-options">
+            <div class="mmp-card">
+                <button class="mmp-back" data-back>‹ Geri</button>
+                <h2 class="mmp-title">Options</h2>
+                <div class="mm-opt">
+                    <button class="mm-toggle" id="mm-sound-toggle" aria-pressed="true">
+                        <span class="mm-sub-name">Ses</span>
+                        <span class="mm-toggle-state" id="mm-sound-state">AÇIK</span>
+                    </button>
+                    <div class="mm-slider-row">
+                        <label for="mm-sens">Bakış Hassasiyeti <span id="mm-sens-val">1.0×</span></label>
+                        <input type="range" id="mm-sens" min="0.3" max="2.5" step="0.1" value="1.0">
+                    </div>
+                    <button class="mm-toggle" id="mm-invert-toggle" aria-pressed="false">
+                        <span class="mm-sub-name">Bakışı Ters Çevir (Y)</span>
+                        <span class="mm-toggle-state" id="mm-invert-state">KAPALI</span>
+                    </button>
+                    <button class="mm-toggle" id="mm-quality-toggle" aria-pressed="true">
+                        <span class="mm-sub-name">Grafik Kalitesi</span>
+                        <span class="mm-toggle-state" id="mm-quality-state">YÜKSEK</span>
+                    </button>
+                    <button class="mm-toggle" id="mm-fps-toggle" aria-pressed="false">
+                        <span class="mm-sub-name">FPS Göster</span>
+                        <span class="mm-toggle-state" id="mm-fps-state">KAPALI</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- EXIT -->
+        <div class="mm-page hidden" id="mm-page-exit">
+            <div class="mmp-card mmp-card-narrow">
+                <button class="mmp-back" data-back>‹ Geri</button>
+                <h2 class="mmp-title">Exit</h2>
+                <p class="mmp-sub">Oyundan çıkmak istediğine emin misin?</p>
+                <button class="mmp-danger" data-action="exit">Evet, çık</button>
+            </div>
+        </div>
+
+        <div class="mm-tip">
+            <span class="mm-tip-k">TIP</span>
+            <span class="mm-tip-t" id="mm-tip-text"></span>
+        </div>
+
+        <div class="mm-version">v0.1</div>
+    </div>
+
+    <!-- ===== Pause (oyun içi duraklatma, 2026-07-03) — yalnız yerel modlarda ===== -->
+    <button id="pause-btn" class="hidden" aria-label="Duraklat">⏸</button>
+    <div id="pause-menu" class="hidden">
+        <div class="mmp-card mmp-card-narrow">
+            <h2 class="mmp-title">Duraklatıldı</h2>
+            <div class="pm-list">
+                <button class="pm-btn pm-resume" id="pm-resume">▶ &nbsp;Devam Et</button>
+                <button class="pm-btn" id="pm-restart">↻ &nbsp;Yeniden Başlat</button>
+                <button class="pm-btn pm-quit" id="pm-mainmenu">🏠 &nbsp;Ana Menü</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== LAN (iki cihaz) bağlanma ekranı ===== -->
+    <div id="lan-menu" class="hidden">
+        <div class="lan-card">
+            <button class="lan-back" id="lan-back" aria-label="Geri">‹ Geri</button>
+            <h2 class="lan-title">İki Cihaz · LAN</h2>
+            <p class="lan-sub">İki telefon da <b>aynı WiFi</b>'de olmalı. Biri sunucu kurar, diğeri IP ile katılır.</p>
+
+            <!-- Seçim ekranı -->
+            <div class="lan-choose" id="lan-choose">
+                <button class="lan-big" id="lan-host-btn">
+                    <span class="lan-big-ico">📡</span>
+                    <span class="lan-big-name">Sunucu Kur</span>
+                    <span class="lan-big-desc">Bu telefon sunucu olur (host)</span>
+                </button>
+                <button class="lan-big" id="lan-join-btn">
+                    <span class="lan-big-ico">🔌</span>
+                    <span class="lan-big-name">Katıl</span>
+                    <span class="lan-big-desc">Arkadaşının sunucusuna bağlan</span>
+                </button>
+            </div>
+
+            <!-- Host paneli -->
+            <div class="lan-panel hidden" id="lan-host-panel">
+                <p class="lan-step">Arkadaşına şu adresi ver:</p>
+                <div class="lan-addr" id="lan-host-addr">…</div>
+                <div class="lan-status" id="lan-host-status">İstemci bekleniyor…</div>
+                <button class="lan-start hidden" id="lan-start-btn">BAŞLAT</button>
+            </div>
+
+            <!-- Join paneli -->
+            <div class="lan-panel hidden" id="lan-join-panel">
+                <p class="lan-step">Sunucu adresini gir (host telefonun gösterdiği):</p>
+                <div class="lan-join-row">
+                    <input type="text" id="lan-ip-input" inputmode="decimal" placeholder="192.168.1.42" autocomplete="off">
+                    <span class="lan-port">: 8787</span>
+                </div>
+                <button class="lan-start" id="lan-connect-btn">BAĞLAN</button>
+                <div class="lan-status" id="lan-join-status"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Touch Controls (only shown on touch devices, body.touch-active) ===== -->
+
+    <!-- Virtual joystick (bottom-left) — character movement -->
+    <div id="touch-joystick">
+        <div id="touch-joystick-knob"></div>
+    </div>
+
+    <!-- Shoot button (bottom-right) — hold to charge, release to fire.
+         Saboteur turns swap this for the TRAP button (body.sabo-role). -->
+    <button id="shoot-btn" aria-label="Shoot">
+        <span class="shoot-icon">🎱</span>
+        <span class="shoot-label">SHOOT</span>
+    </button>
+
+    <!-- Use-item button (bottom-right) — saboteur uses the held item (e.g. 🍌).
+         Shown only while body.sabo-role (the human is the saboteur this turn).
+         Icon/label reflect the held item (TouchControls.setItem); dimmed when empty. -->
+    <button id="trap-btn" aria-label="Use item">
+        <span class="trap-icon">·</span>
+        <span class="trap-label">KULLAN</span>
+    </button>
+
+    <!-- Shield button (bottom-right, above SHOOT) — defense: the shooter raises a
+         shield (🛡️) while approaching the cue ball. Shown only when the human is the
+         shooter and holds a defense item (TouchControls.setShield); hidden otherwise. -->
+    <button id="shield-btn" aria-label="Use shield">
+        <span class="shield-icon">🛡️</span>
+        <span class="shield-label">KALKAN</span>
+    </button>
+
+    <!-- Ulti button (left of SHOOT) — appears ONLY when ultimate energy is full
+         (TouchControls.setUlti). Tap → the character channels its ultimate
+         (🔥 Enerji Dalgası: locked in place, aim steers the laser). -->
+    <button id="ulti-btn" aria-label="Ultimate">
+        <span class="ulti-btn-icon">🔥</span>
+        <span class="ulti-btn-label">ULTİ</span>
+    </button>
+
+    <!-- Zoom buttons -->
+    <div id="touch-zoom">
+        <button id="zoom-in" aria-label="Zoom in">+</button>
+        <button id="zoom-out" aria-label="Zoom out">−</button>
+    </div>
+
+    <!-- Rotate-to-landscape prompt (portrait on touch devices) -->
+    <div id="rotate-overlay">
+        <div class="rotate-content">
+            <div class="rotate-icon">📱</div>
+            <p>Daha iyi bir deneyim için<br>telefonu <strong>yatay</strong> çevirin</p>
+        </div>
+    </div>
+
+    <!-- Bağımlılıklar artık yerel node_modules'tan Vite ile paketleniyor (çevrimdışı). -->
+    <script type="module" src="/js/main.js"></script>
+</body>
+</html>
