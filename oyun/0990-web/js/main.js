@@ -462,15 +462,17 @@ function wireNetSession() {
         _lastSnap = obj;
         
         // İstemci tarafında kamera 180 derece ters açıda olduğu için sunucudan gelen
-        // RAKİP karakterin (pl[0] - Host) rotasyonuna 180 derece (Math.PI) ekliyoruz.
-        // Kendi karakterimiz (pl[1] - Client) zaten bizim kameramıza göre ters açıyla
-        // simüle edildiği için onun rotasyonuna dokunmuyoruz.
+        // RAKİP karakterin (pl[0] - Host) rotasyonuna, SADECE yürüyor veya koşuyorsa (a === 1 veya a === 2)
+        // 180 derece (Math.PI) ekliyoruz. Atış yaparken veya dururken (beyaz topa nişan alırken)
+        // rotasyon zaten beyaz topun global pozisyonuna göre doğru hesaplandığı için dokunmuyoruz.
         if (netRole === 'client' && obj.pl && obj.pl[0]) {
             const opp = obj.pl[0];
-            opp.r = opp.r + Math.PI;
-            // [-PI, PI] aralığına normalize et
-            while (opp.r > Math.PI) opp.r -= 2 * Math.PI;
-            while (opp.r < -Math.PI) opp.r += 2 * Math.PI;
+            if (opp.a === 1 || opp.a === 2) {
+                opp.r = opp.r + Math.PI;
+                // [-PI, PI] aralığına normalize et
+                while (opp.r > Math.PI) opp.r -= 2 * Math.PI;
+                while (opp.r < -Math.PI) opp.r += 2 * Math.PI;
+            }
         }
 
         _snapBuf.push({ t: performance.now() / 1000, snap: obj });
@@ -722,22 +724,18 @@ function netClientFrame(dt, dx, dy, scroll) {
             body.position.y = sy;
 
             // ROTASYON EŞİTLEMESİ (Geri geri koşma & Yön sapması koruması):
-            // Kendi rotasyonumuzu sadece yürümediğimiz durumlarda (dururken veya nişan alırken) sunucuyla eşitliyoruz.
-            // Yürürken yerel prediction zaten anlık kamera yönüyle karakteri kusursuz döndürdüğü için çakışmayı ve yamulmayı önlüyoruz.
-            const isLocalMoving = (mv && (Math.abs(mv.x) > 0.01 || Math.abs(mv.y) > 0.01));
-            if (!isLocalMoving) {
-                let targetRot = mySnap.r;
-                let currentRot = players[myPlayerNum].mesh.rotation.y;
-                while (targetRot > Math.PI) targetRot -= 2 * Math.PI;
-                while (targetRot < -Math.PI) targetRot += 2 * Math.PI;
-                while (currentRot > Math.PI) currentRot -= 2 * Math.PI;
-                while (currentRot < -Math.PI) currentRot += 2 * Math.PI;
+            // Kendi rotasyonumuzu sunucuyla yumuşakça eşitliyoruz (desync önlenir).
+            let targetRot = mySnap.r;
+            let currentRot = players[myPlayerNum].mesh.rotation.y;
+            while (targetRot > Math.PI) targetRot -= 2 * Math.PI;
+            while (targetRot < -Math.PI) targetRot += 2 * Math.PI;
+            while (currentRot > Math.PI) currentRot -= 2 * Math.PI;
+            while (currentRot < -Math.PI) currentRot += 2 * Math.PI;
 
-                let diffRot = targetRot - currentRot;
-                while (diffRot > Math.PI) diffRot -= 2 * Math.PI;
-                while (diffRot < -Math.PI) diffRot += 2 * Math.PI;
-                players[myPlayerNum].mesh.rotation.y += diffRot * 0.15;
-            }
+            let diffRot = targetRot - currentRot;
+            while (diffRot > Math.PI) diffRot -= 2 * Math.PI;
+            while (diffRot < -Math.PI) diffRot += 2 * Math.PI;
+            players[myPlayerNum].mesh.rotation.y += diffRot * 0.15;
 
             // Animasyon durumunu sunucudan eşitle
             players[myPlayerNum].isKicking = (mySnap.a === 3);
