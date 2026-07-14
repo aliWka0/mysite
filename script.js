@@ -5,7 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const ctx = canvas.getContext('2d');
 
     // 3D Configuration
-    const particleCount = 350; // Optimized for Constellation Lines
+    const isMobile = window.innerWidth < 768;
+    const particleCount = isMobile ? 180 : 700; // Mobilde akıcı performans, masaüstünde yoğun bulut
     const focalLength = 400;
     const depth = 2000;
 

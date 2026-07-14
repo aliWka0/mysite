@@ -171,8 +171,12 @@
             return shader;
         };
 
+        const isMobile = window.innerWidth < 768;
+        const octaves = isMobile ? 5 : 10;
+        const optimizedFragmentShaderSource = fragmentShaderSource.replace('#define OCTAVE_COUNT 10', '#define OCTAVE_COUNT ' + octaves);
+
         const vertexShader = compileShader(vertexShaderSource, gl.VERTEX_SHADER);
-        const fragmentShader = compileShader(fragmentShaderSource, gl.FRAGMENT_SHADER);
+        const fragmentShader = compileShader(optimizedFragmentShaderSource, gl.FRAGMENT_SHADER);
         if (!vertexShader || !fragmentShader) return;
 
         const program = gl.createProgram();

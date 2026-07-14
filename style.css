@@ -557,6 +557,9 @@ footer {
 
     .glass-card {
         padding: 24px 20px;
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        will-change: transform, opacity;
     }
 
     .about-text h2 {
