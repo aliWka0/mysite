@@ -75,7 +75,7 @@ let netRole = null;          // null | 'host' | 'client'
 let myPlayerNum = 1;         // host bu cihazda players[1]'i, istemci players[2]'yi sürer
 let _lastSnap = null;        // istemci: en son alınan snapshot (st/cp okumaları için)
 let _snapBuf = [];           // istemci: [{t, snap}] interpolasyon tamponu (jitter yutar)
-const INTERP_DELAY = 0.10;   // s — render bu kadar geriden (client-side prediction ile düşürüldü)
+const INTERP_DELAY = 0.20;   // s — render bu kadar geriden (rakip interpolasyonu için pürüzsüz tampon)
 let _clientBallsMoving = false; // istemci: toplar hareket halinde mi (yerel fizik çalıştırılacak)
 let _snapAccum = 0;          // host: snapshot gönderim biriktirici (SNAP_HZ)
 let _inputAccum = 0;         // istemci: girdi gönderim biriktirici (INPUT_HZ)
@@ -666,17 +666,57 @@ function hostUpdateChars(dt, state, camFwd) {
 
 /** İstemci kare: simülasyon yok — snapshot çiz + girdi yolla + kamera + render. */
 function netClientFrame(dt, dx, dy, scroll) {
+    const st = _lastSnap && _lastSnap.st ? _lastSnap.st : null;
+    const cp = st ? st.cp : 1;
+    const sState = st ? st.s : GAME_STATES.WALKING;
+
+    // ---- KENDİ KARAKTERİMİZ YEREL TAHMİN (Client-Side Prediction) ----
+    // Sunucudan gelen snapshot'ı beklemeden yerel olarak 60 FPS'de hareket et.
+    const canWalk = sState === GAME_STATES.WALKING || sState === GAME_STATES.BALLS_MOVING || sState === GAME_STATES.SHOOTING;
+    let mv = ZERO_MOVE;
+    let fwd = FORWARD_Z;
+    if (canWalk && !_clientCharging && !players[myPlayerNum].isRagdoll) {
+        mv = readHumanMoveInput();
+        sceneManager.camera.getWorldDirection(_aimDir);
+        fwd = _camFwdXZ.set(_aimDir.x, 0, _aimDir.z);
+        if (fwd.lengthSq() > 1e-6) fwd.normalize();
+        // Karakterimizi yerel olarak hareket ettiriyoruz
+        players[myPlayerNum].update(dt, mv, fwd);
+    } else {
+        // Hareket yoksa veya ragdoll ise sadece animasyon/durum güncelle
+        players[myPlayerNum].update(dt, ZERO_MOVE, FORWARD_Z);
+    }
+
+    // ---- SUNUCU İLE YUMUŞAK EŞİTLEME (Kendi Karakterimiz) ----
+    // Karakterimizin konumu sunucudan gelen son snapshot ile yumuşakça eşlenir (desync önlenir).
+    if (_lastSnap && _lastSnap.pl) {
+        const mySnap = _lastSnap.pl[myPlayerNum - 1];
+        if (mySnap && !players[myPlayerNum].isRagdoll) {
+            const body = players[myPlayerNum].body;
+            const sx = mySnap.p[0], sy = mySnap.p[1], sz = mySnap.p[2];
+            const dx = sx - body.position.x;
+            const dz = sz - body.position.z;
+            const distSq = dx * dx + dz * dz;
+
+            if (distSq > 0.25) {
+                // Büyük fark → doğrudan eşitle
+                body.position.set(sx, sy, sz);
+            } else {
+                // Küçük fark → yumuşak çek (%10)
+                body.position.x += dx * 0.10;
+                body.position.z += dz * 0.10;
+            }
+            body.position.y = sy;
+            // Animasyon durumunu sunucudan eşitle
+            players[myPlayerNum].isKicking = (mySnap.a === 3);
+        }
+    }
+
     // ---- TOP HAREKETİ: Hız ekstrapolasyonu (CANNON fiziği YOK) ----
-    // Toplar hareket halindeyken, son snapshot'tan gelen hızlarla düz çizgide ilerlet.
-    // Fizik motoru KULLANMIYORUZ çünkü host ile istemcinin fizik motorları
-    // zamanlama farkları yüzünden farklı sonuçlar üretir → toplar zıplar.
-    // Yerine: her snapshot'ta pozisyon + hız doğrudan alınır, arada lineer ilerletilir.
     if (_clientBallsMoving && _lastSnap && _lastSnap.b) {
-        // _clientBallVels: snapshot'tan gelen hızları kullanarak topları ilerlet
         for (const it of _lastSnap.b) {
             const id = it[0];
             const vx = it[4] || 0, vz = it[5] || 0;
-            // Hız sıfıra yakınsa ilerletmeye gerek yok
             if (Math.abs(vx) < 0.001 && Math.abs(vz) < 0.001) continue;
             const body = ballPhysics.getBallBody(id);
             if (!body) continue;
@@ -688,7 +728,8 @@ function netClientFrame(dt, dx, dy, scroll) {
         balls.syncWithPhysics(positions, quaternions);
     }
 
-    // ---- KARAKTER İNTERPOLASYONU ----
+    // ---- RAKİP OYUNCU İNTERPOLASYONU ----
+    // Diğer oyuncuyu pürüzsüz interpolasyon ile hareket ettir.
     const renderT = performance.now() / 1000 - INTERP_DELAY;
     let s0 = null, s1 = null;
     for (let i = _snapBuf.length - 1; i >= 1; i--) {
@@ -699,21 +740,25 @@ function netClientFrame(dt, dx, dy, scroll) {
     if (s0 && s1) {
         const span = s1.t - s0.t;
         const alpha = span > 1e-4 ? Math.min(1, Math.max(0, (renderT - s0.t) / span)) : 1;
-        // Karakterleri interpolasyonla güncelle
+        
+        // Sadece rakip oyuncuyu interpolasyonla güncelle
         if (s0.snap.pl && s1.snap.pl) {
-            const lA = (e0, e1, a, d, p) => {
-                if (!e0 || !e1) return;
-                const x = e0.p[0] + (e1.p[0] - e0.p[0]) * a;
-                const y = e0.p[1] + (e1.p[1] - e0.p[1]) * a;
-                const z = e0.p[2] + (e1.p[2] - e0.p[2]) * a;
+            const otherPlayerNum = myPlayerNum === 1 ? 2 : 1;
+            const e0 = s0.snap.pl[otherPlayerNum - 1];
+            const e1 = s1.snap.pl[otherPlayerNum - 1];
+            const p = players[otherPlayerNum];
+
+            if (e0 && e1) {
+                const rag = !!e1.g;
+                const x = e0.p[0] + (e1.p[0] - e0.p[0]) * alpha;
+                const y = e0.p[1] + (e1.p[1] - e0.p[1]) * alpha;
+                const z = e0.p[2] + (e1.p[2] - e0.p[2]) * alpha;
                 let dd = e1.r - e0.r;
                 while (dd > Math.PI) dd -= 2 * Math.PI;
                 while (dd < -Math.PI) dd += 2 * Math.PI;
-                const ry = e0.r + dd * a;
-                p.applyNet(d, x, y, z, ry, e1.a, !!e1.g, e1.q);
-            };
-            lA(s0.snap.pl[0], s1.snap.pl[0], alpha, dt, players[1]);
-            lA(s0.snap.pl[1], s1.snap.pl[1], alpha, dt, players[2]);
+                const ry = e0.r + dd * alpha;
+                p.applyNet(dt, x, y, z, ry, e1.a, rag, e1.q);
+            }
         }
         // Toplar duruyorsa snapshot interpolasyonu kullan
         if (!_clientBallsMoving && s1.snap.b) {
@@ -734,10 +779,11 @@ function netClientFrame(dt, dx, dy, scroll) {
             for (const id of balls.getAllActiveBallIds()) if (!present.has(id)) balls.removeBall(id);
         }
     } else if (_lastSnap) {
+        // Tampon yetersizse rakip verilerini doğrudan uygula
+        const otherPlayerNum = myPlayerNum === 1 ? 2 : 1;
         if (_lastSnap.pl) {
-            const a = _lastSnap.pl[0], c = _lastSnap.pl[1];
-            if (a) players[1].applyNet(dt, a.p[0], a.p[1], a.p[2], a.r, a.a, !!a.g, a.q);
-            if (c) players[2].applyNet(dt, c.p[0], c.p[1], c.p[2], c.r, c.a, !!c.g, c.q);
+            const opp = _lastSnap.pl[otherPlayerNum - 1];
+            if (opp) players[otherPlayerNum].applyNet(dt, opp.p[0], opp.p[1], opp.p[2], opp.r, opp.a, !!opp.g, opp.q);
         }
         if (!_clientBallsMoving && _lastSnap.b) {
             const map = new Map();
@@ -747,10 +793,6 @@ function netClientFrame(dt, dx, dy, scroll) {
             for (const id of balls.getAllActiveBallIds()) if (!present.has(id)) balls.removeBall(id);
         }
     }
-
-    const st = _lastSnap && _lastSnap.st ? _lastSnap.st : null;
-    const cp = st ? st.cp : 1;
-    const sState = st ? st.s : GAME_STATES.WALKING;
 
     if (st) {
         uiManager.updateTurn(cp, false);
