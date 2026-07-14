@@ -674,21 +674,21 @@ function netClientFrame(dt, dx, dy, scroll) {
     // Sunucudan gelen snapshot'ı beklemeden yerel olarak 60 FPS'de hareket et.
     const canWalk = sState === GAME_STATES.WALKING || sState === GAME_STATES.BALLS_MOVING || sState === GAME_STATES.SHOOTING;
     let mv = ZERO_MOVE;
-    let fwd = FORWARD_Z;
+    let fwd = new THREE.Vector3(0, 0, 1);
     if (canWalk && !_clientCharging && !players[myPlayerNum].isRagdoll) {
         mv = readHumanMoveInput();
         sceneManager.camera.getWorldDirection(_aimDir);
-        fwd = _camFwdXZ.set(_aimDir.x, 0, _aimDir.z);
+        // Yeni bir Vector3 oluşturarak referans çakışmasını engelle
+        fwd.set(_aimDir.x, 0, _aimDir.z);
         if (fwd.lengthSq() > 1e-6) fwd.normalize();
         // Karakterimizi yerel olarak hareket ettiriyoruz
         players[myPlayerNum].update(dt, mv, fwd);
     } else {
-        // Hareket yoksa veya ragdoll ise sadece animasyon/durum güncelle
         players[myPlayerNum].update(dt, ZERO_MOVE, FORWARD_Z);
     }
 
     // ---- SUNUCU İLE YUMUŞAK EŞİTLEME (Kendi Karakterimiz) ----
-    // Karakterimizin konumu sunucudan gelen son snapshot ile yumuşakça eşlenir (desync önlenir).
+    // Karakterimizin konumu ve yönü sunucudan gelen son snapshot ile yumuşakça eşlenir (desync önlenir).
     if (_lastSnap && _lastSnap.pl) {
         const mySnap = _lastSnap.pl[myPlayerNum - 1];
         if (mySnap && !players[myPlayerNum].isRagdoll) {
@@ -707,6 +707,14 @@ function netClientFrame(dt, dx, dy, scroll) {
                 body.position.z += dz * 0.10;
             }
             body.position.y = sy;
+
+            // ROTASYON EŞİTLEMESİ (Geri geri koşma & Yön sapması koruması):
+            // Kendi rotasyonumuzu da sunucunun rotasyonuna yumuşakça yaklaştırıyoruz (%15)
+            let diffRot = mySnap.r - players[myPlayerNum].mesh.rotation.y;
+            while (diffRot > Math.PI) diffRot -= 2 * Math.PI;
+            while (diffRot < -Math.PI) diffRot += 2 * Math.PI;
+            players[myPlayerNum].mesh.rotation.y += diffRot * 0.15;
+
             // Animasyon durumunu sunucudan eşitle
             players[myPlayerNum].isKicking = (mySnap.a === 3);
         }
