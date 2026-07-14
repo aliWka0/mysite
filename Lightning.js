@@ -135,13 +135,8 @@
                 float dist2 = abs(uv.x + 0.4 * fbm(fbmUV * 2.0 + 10.0) - 0.2);
                 float dist3 = abs(uv.x - 0.5 * fbm(fbmUV * 1.5 - 5.0) + 0.25);
                 
-                // Monochrome version for black/white theme
-                vec3 baseColor;
-                if (uHue < 1.0) {
-                    baseColor = vec3(0.9, 0.9, 0.95);
-                } else {
-                    baseColor = hsv2rgb(vec3(uHue / 360.0, 0.7, 0.8));
-                }
+                // Mavi elektrik yıldırımı rengi (Neon Electric Blue)
+                vec3 baseColor = vec3(0.12, 0.55, 1.0);
                 
                 // OVERLOAD INTENSITY (Scroll Aşırı Yüklenmesi)
                 // Kaydırma anındaki patlamayı daha naif ve akıcı yaptık (çarpanları kıstık)
