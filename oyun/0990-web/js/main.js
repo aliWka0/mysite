@@ -641,19 +641,18 @@ function hostUpdateChars(dt, state, camFwd) {
     const active = gameManager.currentPlayer;   // 1 = host(yerel), 2 = istemci(uzak)
     const walkStates = state === GAME_STATES.WALKING ||
         state === GAME_STATES.BALLS_MOVING || state === GAME_STATES.SHOOTING;
-    if (active === 1) {
-        const inp = (walkStates && !players[1].isRagdoll) ? readHumanMoveInput() : ZERO_MOVE;
-        players[1].update(dt, inp, camFwd);
-        players[2].update(dt, ZERO_MOVE, FORWARD_Z);
-    } else {
-        const inp = walkStates ? remoteController.moveInput : ZERO_MOVE;
-        players[2].update(dt, inp, remoteController.forward);
-        players[1].update(dt, ZERO_MOVE, FORWARD_Z);
-        // İstemci atışı: yalnız kendi sırasında + WALKING + tekme atmıyorken.
-        if (state === GAME_STATES.WALKING && !players[2].isKicking) {
-            const s = remoteController.consumeShoot();
-            if (s) botShoot(s.aim, s.power);
-        }
+
+    // Her iki oyuncu da her zaman yürüyebilir! (ZERO_MOVE dondurması kaldırıldı)
+    const inp1 = (walkStates && !players[1].isRagdoll) ? readHumanMoveInput() : ZERO_MOVE;
+    players[1].update(dt, inp1, camFwd);
+
+    const inp2 = (walkStates && !players[2].isRagdoll) ? remoteController.moveInput : ZERO_MOVE;
+    players[2].update(dt, inp2, remoteController.forward);
+
+    // İstemci atışı: yalnız kendi sırasında + WALKING + tekme atmıyorken.
+    if (active === 2 && state === GAME_STATES.WALKING && !players[2].isKicking) {
+        const s = remoteController.consumeShoot();
+        if (s) botShoot(s.aim, s.power);
     }
 }
 
@@ -684,23 +683,24 @@ function netClientFrame(dt, dx, dy, scroll) {
         if (st.t1) uiManager.updatePlayerTypes(st.t1, st.t2);
     }
 
-    // Kamera oynayan (cp) karakteri takip eder.
-    if (cp !== _clientCamNum) {
-        _clientCamNum = cp;
-        cameraController.setFollowTarget(players[cp].mesh);
+    // Kamera DAİMA istemcinin KENDİ karakterini (myPlayerNum) takip eder.
+    const camTargetNum = myPlayerNum;
+    if (camTargetNum !== _clientCamNum) {
+        _clientCamNum = camTargetNum;
+        cameraController.setFollowTarget(players[camTargetNum].mesh);
         cameraController.setMode('free');
     }
     if (inputManager.isPointerLocked() || IS_TOUCH) cameraController.handleRotation(dx, dy);
     if (scroll) cameraController.handleZoom(scroll);
-    cameraController.setTarget(players[cp].mesh.position);
+    cameraController.setTarget(players[camTargetNum].mesh.position);
 
-    // Yerel girdi → host (yalnız bizim sıramızda + WALKING + şarj etmiyorken hareket).
+    // Yerel girdi → host (sıra şartı KALKTI, her zaman hareket edebilir)
     const myTurn = cp === myPlayerNum;
     _inputAccum += dt;
     if (_inputAccum >= 1 / INPUT_HZ) {
         _inputAccum = 0;
-        const mv = (myTurn && !_clientCharging && sState === GAME_STATES.WALKING)
-            ? readHumanMoveInput() : ZERO_MOVE;
+        const canWalk = sState === GAME_STATES.WALKING || sState === GAME_STATES.BALLS_MOVING || sState === GAME_STATES.SHOOTING;
+        const mv = (!_clientCharging && canWalk) ? readHumanMoveInput() : ZERO_MOVE;
         sceneManager.camera.getWorldDirection(_aimDir);
         const f = _camFwdXZ.set(_aimDir.x, 0, _aimDir.z);
         if (f.lengthSq() > 1e-6) f.normalize();
@@ -919,10 +919,9 @@ function localCanShoot() {
  * dışında null (item kullanılamaz). Hangi item'in kullanılabileceğini bu belirler.
  */
 function humanActiveRole() {
-    if (gameManager.mode !== 'vsbot') return null;
     const s = gameManager.getState();
     if (s !== GAME_STATES.WALKING && s !== GAME_STATES.POWER) return null;
-    return gameManager.currentPlayer === gameManager.humanPlayer ? 'shooter' : 'saboteur';
+    return gameManager.currentPlayer === myPlayerNum ? 'shooter' : 'saboteur';
 }
 
 /**
@@ -945,7 +944,7 @@ function applyTurnRoles() {
     // Touch: insan sabotajcıyken USE-ITEM, nişancıyken SHOOT göster.
     if (touchControls) {
         touchControls.setRole(
-            gameManager.mode === 'vsbot' && gameManager.isBotTurn() ? 'saboteur' : 'shooter'
+            gameManager.currentPlayer !== myPlayerNum ? 'saboteur' : 'shooter'
         );
     }
     // Eşya item'ları artık KUTULARDAN gelir (Faz 2); tur başında otomatik verilmez.

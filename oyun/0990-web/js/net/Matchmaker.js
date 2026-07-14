@@ -45,13 +45,7 @@ export class Matchmaker {
             } catch(e) {}
         });
 
-        // 15 Saniye bot beklemesi (Timeout)
-        this.matchTimeout = setTimeout(() => {
-            if (!this.matched) {
-                this.stopMatchmaking();
-                onTimeout(); // 15 sn geçti adam yok, VS BOT ile başlat.
-            }
-        }, 15000);
+        // 15 Saniye bot beklemesi (Timeout) KALDIRILDI. Artık gerçek oyuncu gelene kadar sonsuza dek beklenecek.
     }
 
     broadcastPresence() {
