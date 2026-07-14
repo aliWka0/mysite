@@ -462,16 +462,15 @@ function wireNetSession() {
         _lastSnap = obj;
         
         // İstemci tarafında kamera 180 derece ters açıda olduğu için sunucudan gelen
-        // tüm karakter rotasyonlarına 180 derece (Math.PI) ekleyerek düzeltiyoruz.
-        if (netRole === 'client' && obj.pl) {
-            obj.pl.forEach(p => {
-                if (p) {
-                    p.r = p.r + Math.PI;
-                    // [-PI, PI] aralığına normalize et
-                    while (p.r > Math.PI) p.r -= 2 * Math.PI;
-                    while (p.r < -Math.PI) p.r += 2 * Math.PI;
-                }
-            });
+        // RAKİP karakterin (pl[0] - Host) rotasyonuna 180 derece (Math.PI) ekliyoruz.
+        // Kendi karakterimiz (pl[1] - Client) zaten bizim kameramıza göre ters açıyla
+        // simüle edildiği için onun rotasyonuna dokunmuyoruz.
+        if (netRole === 'client' && obj.pl && obj.pl[0]) {
+            const opp = obj.pl[0];
+            opp.r = opp.r + Math.PI;
+            // [-PI, PI] aralığına normalize et
+            while (opp.r > Math.PI) opp.r -= 2 * Math.PI;
+            while (opp.r < -Math.PI) opp.r += 2 * Math.PI;
         }
 
         _snapBuf.push({ t: performance.now() / 1000, snap: obj });
