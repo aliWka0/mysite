@@ -722,18 +722,22 @@ function netClientFrame(dt, dx, dy, scroll) {
             body.position.y = sy;
 
             // ROTASYON EŞİTLEMESİ (Geri geri koşma & Yön sapması koruması):
-            // Kendi rotasyonumuzu sunucuyla yumuşakça eşitliyoruz (desync önlenir).
-            let targetRot = mySnap.r;
-            let currentRot = players[myPlayerNum].mesh.rotation.y;
-            while (targetRot > Math.PI) targetRot -= 2 * Math.PI;
-            while (targetRot < -Math.PI) targetRot += 2 * Math.PI;
-            while (currentRot > Math.PI) currentRot -= 2 * Math.PI;
-            while (currentRot < -Math.PI) currentRot += 2 * Math.PI;
+            // Kendi rotasyonumuzu sadece yürümediğimiz durumlarda (dururken veya nişan alırken) sunucuyla eşitliyoruz.
+            // Yürürken yerel prediction zaten anlık kamera yönüyle karakteri kusursuz döndürdüğü için çakışmayı ve yamulmayı önlüyoruz.
+            const isLocalMoving = (mv && (Math.abs(mv.x) > 0.01 || Math.abs(mv.y) > 0.01));
+            if (!isLocalMoving) {
+                let targetRot = mySnap.r;
+                let currentRot = players[myPlayerNum].mesh.rotation.y;
+                while (targetRot > Math.PI) targetRot -= 2 * Math.PI;
+                while (targetRot < -Math.PI) targetRot += 2 * Math.PI;
+                while (currentRot > Math.PI) currentRot -= 2 * Math.PI;
+                while (currentRot < -Math.PI) currentRot += 2 * Math.PI;
 
-            let diffRot = targetRot - currentRot;
-            while (diffRot > Math.PI) diffRot -= 2 * Math.PI;
-            while (diffRot < -Math.PI) diffRot += 2 * Math.PI;
-            players[myPlayerNum].mesh.rotation.y += diffRot * 0.15;
+                let diffRot = targetRot - currentRot;
+                while (diffRot > Math.PI) diffRot -= 2 * Math.PI;
+                while (diffRot < -Math.PI) diffRot += 2 * Math.PI;
+                players[myPlayerNum].mesh.rotation.y += diffRot * 0.15;
+            }
 
             // Animasyon durumunu sunucudan eşitle
             players[myPlayerNum].isKicking = (mySnap.a === 3);
@@ -956,7 +960,7 @@ function updateCameraJuice(dt, state) {
 
     // Koşu bob şiddeti: takip edilen karakterin yatay hızı / referans (walkSpeed).
     let intensity = 0;
-    if (_camFocusLast && dt > 0) {
+    if (_camFocusLast && dt > 0 && focus._moving) {
         const moved = Math.hypot(p.x - _camFocusLast.x, p.z - _camFocusLast.z);
         const sp = moved / dt;
         intensity = Math.min(1, sp / CAMERA.BOB_REF_SPEED);
