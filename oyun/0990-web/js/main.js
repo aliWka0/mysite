@@ -772,7 +772,8 @@ function syncActivePlayer() {
  * players[1]'i sürer ve kamera onu takip eder. Diğer modlarda aktif oyuncu.
  */
 function focusCharacter() {
-    return gameManager.mode === 'vsbot' ? players[1] : player;
+    // Multiplayer'da sıra kime geçerse geçsin herkes kendi kamerasını (oyuncusunu) izler.
+    return players[myPlayerNum];
 }
 
 /**
