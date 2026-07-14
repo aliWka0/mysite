@@ -394,7 +394,7 @@ function startGame(mode = 'local2p') {
     });
 
     // Camera glides slowly from the close menu shot around to behind player 1.
-    cameraController.setFollowTarget(player.mesh);
+    cameraController.setFollowTarget(players[myPlayerNum].mesh);
     cameraController.setMode('free');
     cameraController._targetAzimuth = Math.PI; // sweep around to behind the character
     cameraController.slowTransition(1.5);
@@ -546,15 +546,15 @@ function startNetGame(role) {
 
     if (role === 'host') {
         botController.stop();
-        cameraController.setFollowTarget(players[1].mesh);
+        cameraController.setFollowTarget(players[myPlayerNum].mesh);
         cameraController.setMode('free');
         cameraController._targetAzimuth = Math.PI;
         cameraController.slowTransition(1.5);
         gameManager.setState(GAME_STATES.WALKING);
     } else {
-        cameraController.setFollowTarget(players[1].mesh);   // break = host'un sırası → onu izle
+        cameraController.setFollowTarget(players[myPlayerNum].mesh);
         cameraController.setMode('free');
-        _clientCamNum = 1;
+        _clientCamNum = myPlayerNum;
     }
 }
 
@@ -1673,7 +1673,7 @@ function restartGame() {
     players[1].placeAt(PLAYER_START[1].x, PLAYER_START[1].z, PLAYER_START[1].face);
     players[2].placeAt(PLAYER_START[2].x, PLAYER_START[2].z, PLAYER_START[2].face);
     players[1].setVisible(true); players[2].setVisible(true);
-    cameraController.setFollowTarget(player.mesh);
+    cameraController.setFollowTarget(players[myPlayerNum].mesh);
     cameraController.setMode('free');
     if (sabotageManager) sabotageManager.clearAll();   // tuzak+mermi+bomba+kalkan tümünü temizle
     if (itemSystem) itemSystem.reset();              // slotları temizle
