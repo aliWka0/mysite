@@ -111,7 +111,12 @@
             void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
                 vec2 uv = fragCoord / iResolution.xy;
                 uv = 2.0 * uv - 1.0;
-                uv.x *= iResolution.x / iResolution.y;
+                float aspect = iResolution.x / iResolution.y;
+                uv.x *= aspect;
+                if (aspect < 1.0) {
+                    // Mobilde yıldırımın PC'deki gibi ortada zarif ve ince görünmesi için koordinatları ölçekliyoruz (zoom-out)
+                    uv *= 2.0;
+                }
                 uv.x += uXOffset;
                 
                 // MOUSE INTERACTION (Fare Etkileşimi)
