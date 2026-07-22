@@ -5,13 +5,8 @@ class RiftWidget {
         this.animId = null;
         this.videoLoaded = false;
 
-        // Image & Video Elements
-        this.characterImg = new Image();
-        this.characterImg.src = '/assets/images/female_cyber_anime_rift.png';
-        this.imgLoaded = false;
-        this.characterImg.onload = () => { this.imgLoaded = true; };
-
         this.init();
+        this.setVideoSource('/assets/videos/female_cyber_anime_rift.mp4');
     }
 
     init() {
