@@ -9,6 +9,10 @@ class RiftWidget {
         this.isOpen = false;
         this.particles = [];
         this.animId = null;
+        this.characterImg = new Image();
+        this.characterImg.src = '/assets/images/female_cyber_anime_rift.png';
+        this.imgLoaded = false;
+        this.characterImg.onload = () => { this.imgLoaded = true; };
         this.init();
     }
 
@@ -90,14 +94,14 @@ class RiftWidget {
 
     spawnElectricParticles() {
         this.particles = [];
-        const count = 40;
+        const count = 50;
         for (let i = 0; i < count; i++) {
             this.particles.push({
-                x: this.width * 0.85,
-                y: this.height * 0.85,
-                vx: (Math.random() - 0.7) * 8,
-                vy: (Math.random() - 0.7) * 8,
-                size: Math.random() * 4 + 1.5,
+                x: this.width * 0.7,
+                y: this.height * 0.7,
+                vx: (Math.random() - 0.7) * 10,
+                vy: (Math.random() - 0.7) * 10,
+                size: Math.random() * 4 + 2,
                 alpha: 1,
                 decay: Math.random() * 0.02 + 0.01,
                 color: Math.random() > 0.3 ? '#00d2ff' : '#ffffff'
@@ -131,40 +135,33 @@ class RiftWidget {
 
         ctx.save();
 
-        // Glowing Blue Portal Tear Silhouette (Slash)
-        ctx.beginPath();
-        const progress = Math.min(1, frame / 30);
-        const slashLength = h * 0.9 * progress;
+        const progress = Math.min(1, frame / 25);
 
+        // Render Higgsfield Generated Female Anime Character Image
+        if (this.imgLoaded) {
+            ctx.globalAlpha = progress;
+            // Draw image with electric blue glowing border/shadow
+            ctx.shadowColor = '#00d2ff';
+            ctx.shadowBlur = 20;
+
+            // Rounded clip mask for organic portal opening effect
+            ctx.beginPath();
+            ctx.arc(w * 0.5, h * 0.5, (w * 0.48) * progress, 0, Math.PI * 2);
+            ctx.clip();
+
+            ctx.drawImage(this.characterImg, 0, 0, w, h);
+        }
+
+        // Glowing Blue Portal Tear Slash Overlay
+        ctx.beginPath();
+        const slashLength = h * 0.95 * progress;
         ctx.moveTo(w * 0.95, h * 0.05);
         ctx.lineTo(w * 0.95 - slashLength * 0.6, h * 0.05 + slashLength);
         ctx.strokeStyle = '#00d2ff';
-        ctx.lineWidth = 6;
+        ctx.lineWidth = 8;
         ctx.shadowColor = '#00e1ff';
-        ctx.shadowBlur = 25;
+        ctx.shadowBlur = 30;
         ctx.stroke();
-
-        // Dimensional Opening Fill
-        ctx.beginPath();
-        ctx.moveTo(w * 0.95, h * 0.05);
-        ctx.quadraticCurveTo(w * 0.6, h * 0.5, w * 0.95 - slashLength * 0.6, h * 0.05 + slashLength);
-        ctx.fillStyle = 'rgba(0, 150, 255, 0.15)';
-        ctx.fill();
-
-        // Female Anime Character Shadow / Cyber Mask Eye Glow
-        const charAlpha = Math.min(1, frame / 40);
-        ctx.globalAlpha = charAlpha;
-
-        // Glowing Cyber-Ninja Eyes
-        const eyeX = w * 0.72;
-        const eyeY = h * 0.45;
-        ctx.fillStyle = '#00ffff';
-        ctx.shadowColor = '#00ffff';
-        ctx.shadowBlur = 15;
-        ctx.beginPath();
-        ctx.ellipse(eyeX, eyeY, 8, 3, Math.PI / 6, 0, Math.PI * 2);
-        ctx.ellipse(eyeX + 35, eyeY - 5, 8, 3, Math.PI / 6, 0, Math.PI * 2);
-        ctx.fill();
 
         ctx.restore();
     }
