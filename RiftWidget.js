@@ -1,18 +1,16 @@
-/**
- * ============================================================
- * RiftWidget.js - Interactive Female Anime Character Dimensional Rift
- * ============================================================
- */
-
 class RiftWidget {
     constructor() {
         this.isOpen = false;
         this.particles = [];
         this.animId = null;
+        this.videoLoaded = false;
+
+        // Image & Video Elements
         this.characterImg = new Image();
         this.characterImg.src = '/assets/images/female_cyber_anime_rift.png';
         this.imgLoaded = false;
         this.characterImg.onload = () => { this.imgLoaded = true; };
+
         this.init();
     }
 
@@ -20,7 +18,7 @@ class RiftWidget {
         // Create trigger button
         this.createButton();
 
-        // Create container & canvas
+        // Create container & canvas & video player
         this.createViewport();
 
         // Bind events
@@ -47,14 +45,22 @@ class RiftWidget {
         container.className = 'rift-viewport-container';
         container.id = 'rift-viewport-container';
 
-        // Canvas for high performance 60FPS energy slash particles & anime visual
+        // Video Player for Higgsfield Generated Video
+        const video = document.createElement('video');
+        video.className = 'rift-video-player';
+        video.id = 'rift-video-player';
+        video.muted = true;
+        video.loop = true;
+        video.playsInline = true;
+        video.setAttribute('playsinline', '');
+        video.setAttribute('webkit-playsinline', '');
+        container.appendChild(video);
+        this.video = video;
+
+        // Canvas for dynamic diagonal slash line & 60FPS particles
         const canvas = document.createElement('canvas');
         canvas.className = 'rift-canvas-render';
         container.appendChild(canvas);
-
-        const border = document.createElement('div');
-        border.className = 'rift-energy-border';
-        container.appendChild(border);
 
         document.body.appendChild(container);
 
@@ -64,6 +70,14 @@ class RiftWidget {
 
         this.resize();
         window.addEventListener('resize', () => this.resize());
+    }
+
+    setVideoSource(url) {
+        if (this.video) {
+            this.video.src = url;
+            this.video.load();
+            this.videoLoaded = true;
+        }
     }
 
     resize() {
@@ -84,27 +98,36 @@ class RiftWidget {
 
         if (this.isOpen) {
             this.container.classList.add('active');
+            if (this.video && this.videoLoaded) {
+                this.video.play().catch(() => {});
+            }
             this.spawnElectricParticles();
             this.startAnimation();
         } else {
             this.container.classList.remove('active');
+            if (this.video) this.video.pause();
             if (this.animId) cancelAnimationFrame(this.animId);
         }
     }
 
     spawnElectricParticles() {
         this.particles = [];
-        const count = 50;
+        const count = 60;
         for (let i = 0; i < count; i++) {
+            // Spawn along diagonal slash line
+            const t = Math.random();
+            const sx = this.width * (0.85 - t * 0.7);
+            const sy = this.height * (t * 1.0);
+
             this.particles.push({
-                x: this.width * 0.7,
-                y: this.height * 0.7,
-                vx: (Math.random() - 0.7) * 10,
-                vy: (Math.random() - 0.7) * 10,
-                size: Math.random() * 4 + 2,
+                x: sx,
+                y: sy,
+                vx: (Math.random() - 0.5) * 8 - 4,
+                vy: (Math.random() - 0.5) * 8 - 2,
+                size: Math.random() * 5 + 2,
                 alpha: 1,
                 decay: Math.random() * 0.02 + 0.01,
-                color: Math.random() > 0.3 ? '#00d2ff' : '#ffffff'
+                color: Math.random() > 0.25 ? '#00d2ff' : '#ffffff'
             });
         }
     }
@@ -117,8 +140,8 @@ class RiftWidget {
 
             this.ctx.clearRect(0, 0, this.width, this.height);
 
-            // Draw Anime Character Reaching Out / Portal Tear Visual
-            this.drawAnimeCharacterRift(frame);
+            // Draw Dynamic Diagonal Tear Slash Line (Matching User's Red Sketch)
+            this.drawDiagonalSlashLine(frame);
 
             // Draw Electric Slash Particles
             this.updateAndDrawParticles();
@@ -128,40 +151,53 @@ class RiftWidget {
         render();
     }
 
-    drawAnimeCharacterRift(frame) {
+    drawDiagonalSlashLine(frame) {
         const ctx = this.ctx;
         const w = this.width;
         const h = this.height;
 
         ctx.save();
 
-        const progress = Math.min(1, frame / 25);
+        const progress = Math.min(1, frame / 20);
 
-        // Render Higgsfield Generated Female Anime Character Image
-        if (this.imgLoaded) {
-            ctx.globalAlpha = progress;
-            // Draw image with electric blue glowing border/shadow
-            ctx.shadowColor = '#00d2ff';
-            ctx.shadowBlur = 20;
+        // Diagonal Tear Slash Line (From Top Right to Bottom Left)
+        const x1 = w * 0.85;
+        const y1 = 0;
+        const x2 = w * (0.85 - 0.7 * progress);
+        const y2 = h * progress;
 
-            // Rounded clip mask for organic portal opening effect
-            ctx.beginPath();
-            ctx.arc(w * 0.5, h * 0.5, (w * 0.48) * progress, 0, Math.PI * 2);
-            ctx.clip();
-
-            ctx.drawImage(this.characterImg, 0, 0, w, h);
-        }
-
-        // Glowing Blue Portal Tear Slash Overlay
+        // Outer Glow Line
         ctx.beginPath();
-        const slashLength = h * 0.95 * progress;
-        ctx.moveTo(w * 0.95, h * 0.05);
-        ctx.lineTo(w * 0.95 - slashLength * 0.6, h * 0.05 + slashLength);
-        ctx.strokeStyle = '#00d2ff';
-        ctx.lineWidth = 8;
-        ctx.shadowColor = '#00e1ff';
-        ctx.shadowBlur = 30;
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.strokeStyle = '#00e1ff';
+        ctx.lineWidth = 10;
+        ctx.shadowColor = '#00f0ff';
+        ctx.shadowBlur = 35;
         ctx.stroke();
+
+        // Inner Core Cyan Line
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 4;
+        ctx.shadowColor = '#ffffff';
+        ctx.shadowBlur = 15;
+        ctx.stroke();
+
+        // Jagged Energy Lightning Slashes along Tear Line
+        if (frame % 2 === 0) {
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            const midX = (x1 + x2) / 2 + (Math.random() - 0.5) * 30;
+            const midY = (y1 + y2) / 2 + (Math.random() - 0.5) * 30;
+            ctx.lineTo(midX, midY);
+            ctx.lineTo(x2, y2);
+            ctx.strokeStyle = 'rgba(0, 240, 255, 0.8)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
 
         ctx.restore();
     }

@@ -69,36 +69,30 @@
     transform: scale(1.15);
 }
 
-/* 2. Dimensional Rift Canvas / Video Container */
+/* 2. Dimensional Rift Canvas / Video Container (Diagonal Tear Mask) */
 .rift-viewport-container {
     position: fixed;
     bottom: 0;
     right: 0;
-    width: 550px;
-    height: 550px;
-    max-width: 90vw;
-    max-height: 90vh;
+    width: 600px;
+    height: 600px;
+    max-width: 100vw;
+    max-height: 100vh;
     pointer-events: none;
     z-index: 9998;
     overflow: hidden;
     opacity: 0;
-    transform: scale(0.85) translate(40px, 40px);
-    transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Diagonal Clip Path for organic rift opening */
+    clip-path: polygon(100% 0, 100% 100%, 0 100%, 100% 0);
+    transform: translate(30px, 30px);
+    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), clip-path 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .rift-viewport-container.active {
     opacity: 1;
-    transform: scale(1) translate(0, 0);
+    transform: translate(0, 0);
     pointer-events: auto;
-}
-
-/* Dimensional Tear Slash FX Overlay */
-.rift-tear-overlay {
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at 90% 90%, rgba(0, 150, 255, 0.25) 0%, rgba(0, 0, 0, 0) 70%);
-    mix-blend-mode: screen;
-    pointer-events: none;
+    clip-path: polygon(100% 0, 100% 100%, 15% 100%, 85% 0);
 }
 
 /* Video & Canvas Elements */
@@ -109,25 +103,19 @@
     right: 0;
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: cover;
     object-position: bottom right;
 }
 
-/* Dimensional Tear Edges (CSS WebGL / Energy Line) */
-.rift-energy-border {
+/* Diagonal Glowing Slash Line Effect */
+.rift-diagonal-slash-line {
     position: absolute;
-    bottom: 0;
-    right: 0;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
-    background: radial-gradient(ellipse at 100% 100%, transparent 60%, rgba(0, 212, 255, 0.3) 75%, transparent 100%);
     pointer-events: none;
-    animation: riftBorderFlicker 0.15s infinite alternate;
-}
-
-@keyframes riftBorderFlicker {
-    0% { opacity: 0.7; }
-    100% { opacity: 1; }
+    z-index: 9999;
 }
 
 /* Mobile Adjustments */
@@ -139,7 +127,7 @@
         height: 54px;
     }
     .rift-viewport-container {
-        width: 380px;
-        height: 380px;
+        width: 420px;
+        height: 420px;
     }
 }
